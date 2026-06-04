@@ -1,6 +1,5 @@
 ---
 name: events-tracker-qa
-version: "0.1"
 tools:
   - Read
   - mcp__linear-server__list_teams
@@ -21,8 +20,8 @@ description: >
   QA-side tracker work: picking up what's waiting in `QA`, planning and running
   the test pass on staging, then issuing the verdict — approve (`QA approved` +
   `Done`, which means released to prod) or reject (checklist comment + back to
-  `In Progress` + @-mention the dev) — plus filing sub-issue bugs on the issue
-  under test. Handles any `EVTENG-N` reference from the QA seat. Triggers even
+  `In Progress` + @-mention the dev) — plus routing out-of-scope findings to
+  `Triage`. Handles any `EVTENG-N` reference from the QA seat. Triggers even
   when Linear isn't named explicitly. Pairs with the `events-tracker-base` skill
   (from the `events-tracker-shared` plugin, auto-installed as a dependency) for
   catalog + ontology + invariants + MCP-tool guide. Reads are free; writes
@@ -46,15 +45,15 @@ QA's entire surface is one board, one status: `EVTENG` issues in `QA`. There are
 - **Tests on staging.** Reads the issue + comments for the staging link and what changed; plans and runs the relevant flows on staging before promotion.
 - **Approves** when staging holds up: set `QA approved` label + transition to `Done`. `Done` = released to prod — this is the release gate, so it carries per-call confirmation every time.
 - **Rejects** when it doesn't: post a concrete checklist comment + transition back to `In Progress` + @-mention the dev (the assignee).
-- **Files sub-issue bugs** on the Impl Issue under test when a gap is big enough to be its own tracked item (base § Ontology → Sub-issue, use 1).
+- **Routes out-of-scope findings to `Triage`** as new standalone `EVTENG` issues (in-scope findings go in the rejection checklist). Sub-issue on the parent — extreme case only (base § Ontology → Sub-issue).
 
 ### What QA does NOT do
 
 - **Doesn't set `Design approved` or `Dev approved`.** Those are the designer's (on `Design Review`) and the dev's (on `EVTDES` `In Dev Review`). QA owns exactly one marker: `QA approved`, set on the `QA` → `Done` approve (base § Labels → `EVTENG`).
-- **Doesn't transition issues in any status other than `QA`.** QA's only write path on the board is the approve/reject decision on a `QA` issue (and any sub-issue bug). Never touch an Impl Issue sitting in `In Progress`, `In Staging`, `Design Review`, etc. — that's someone else's call.
+- **Doesn't transition issues in any status other than `QA`.** QA's only write path on the board is the approve/reject decision on a `QA` issue (plus filing new `EVTENG` issues for out-of-scope findings, which land in `Triage`). Never touch an Impl Issue sitting in `In Progress`, `In Staging`, `Design Review`, etc. — that's someone else's call.
 - **Doesn't reassign.** Assignee = the dev who delivers, all the way to `Done` (Invariant 1 in `events-tracker-base`). On a reject, QA communicates via comment + @-mention + status change — never by reassigning. The issue is never assigned to QA.
 - **Doesn't create Projects or Initiatives.** Entity-level structure is the PM's job.
-- **Doesn't skip Triage on create.** Any `EVTENG` issue QA creates (a sub-issue bug, or a standalone bug found incidentally) lands in `Triage` — only the PM skips it (base Invariant 2).
+- **Doesn't skip Triage on create.** Any `EVTENG` issue QA creates (an out-of-scope finding, or in the rare extreme case a sub-issue) lands in `Triage` — only the PM skips it (base Invariant 2).
 - **Doesn't write to `EVTDES` or any other Linear team.** Scope is `EVTENG` `QA`. Design Issues, the personal `CON` tracker, and everything else are out of scope.
 
 ### Confirmation rules
@@ -70,7 +69,7 @@ QA's entire surface is one board, one status: `EVTENG` issues in `QA`. There are
 Load on demand — combined base (this skill + `events-tracker-base`) covers the rest of QA's needs.
 
 - `references/qa-pickup-from-staging.md` — load when picking up what's waiting in `EVTENG` `QA`: read the issue + comments for the staging link and what changed, check the `Design approved` state on UI issues, then plan and run the test pass on staging.
-- `references/qa-review-of-impl.md` — load when issuing the verdict on a tested `QA` issue: approve (`QA approved` + `Done`) or reject (checklist comment + `In Progress` + @-mention dev), with sub-issue bugs for gaps too big for a checklist line.
+- `references/qa-review-of-impl.md` — load when issuing the verdict on a tested `QA` issue: approve (`QA approved` + `Done`) or reject (checklist comment + `In Progress` + @-mention dev), with out-of-scope findings routed to `Triage` as standalone issues.
 
 ## Identity resolution
 

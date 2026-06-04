@@ -1,6 +1,5 @@
 ---
 name: events-tracker-pm
-version: "0.1"
 tools:
   - Read
   - mcp__linear-server__list_teams

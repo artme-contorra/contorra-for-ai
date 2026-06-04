@@ -1,6 +1,5 @@
 ---
 name: events-tracker-designer
-version: "0.1"
 tools:
   - Read
   - mcp__linear-server__list_teams
@@ -44,13 +43,13 @@ Designer role for the Events tracker. This skill defines the designer-specific s
 - **Walks own `EVTDES` statuses** to `In Dev Review`, submitting the macro with an @-mention to the responsible dev (Project lead).
 - **Responds to a dev rejection** on an own Design Issue bounced back to `In Progress`: addresses the checklist, returns to `In Dev Review`.
 - **Reviews impl on staging** for Impl Issues in `EVTENG` `Design Review` (dev @-mentioned the designer): compares staging against the Figma macro; approves (set `Design approved` + `QA` + @-mention QA) or rejects (checklist comment + `In Progress` + @-mention dev).
-- **Files sub-issue bugs** on the Impl Issue under review when a gap is big enough to be its own item (per base § Ontology → Sub-issue, use 1).
+- **Routes out-of-scope findings to `Triage`** as new standalone `EVTENG` issues (in-scope findings go in the rejection checklist). Sub-issue on the parent — extreme case only (base § Ontology → Sub-issue).
 
 ### What the designer does NOT do
 
 - **Doesn't create Design Issues.** They're PM-created; ad-hoc design requests go via Slack/PM, who creates the issue in `EVTDES` `Backlog`. The designer claims, doesn't author.
 - **Doesn't create Projects or Initiatives.** Entity-level structure is the PM's job.
-- **Doesn't transition other people's issues outside the review call.** The designer's only writes on `EVTENG` are the `Design Review` approve/reject decision (and any sub-issue bug). Never touch an Impl Issue in another status.
+- **Doesn't transition other people's issues outside the review call.** The designer's only writes on `EVTENG` are the `Design Review` approve/reject decision (plus filing new `EVTENG` issues for out-of-scope findings, which land in `Triage`). Never touch an Impl Issue in another status.
 - **Doesn't reassign on handoff.** Assignee = owner (Invariant 1 in `events-tracker-base`). On the Design Issue the designer stays assignee through `Done`; on the Impl Issue the assignee is the dev and stays the dev — the designer reviews via comment + @-mention, never reassigns.
 - **Doesn't set `Dev approved`.** That label is the **dev's**, set on `EVTDES` `In Dev Review` → `Done`. The designer's design-side approval is the dev's action, not the designer's — the designer never transitions an own Design Issue to `Done`.
 - **Doesn't touch `Artem Personal` or any other Linear team.** Scope is `EVTDES` (own) + `EVTENG` `Design Review` (review).

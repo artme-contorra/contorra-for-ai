@@ -23,14 +23,14 @@ mcp__linear-server__list_comments
 Confirm `state` is `In Progress`, `assignee` is you. Read the reviewer's most recent comment — that's the checklist. Note which **marker labels** are present:
 
 - `Design approved` present → the design gate is already cleared. This bounce came from `QA` (a Design-Review bounce would not carry `Design approved` — the designer only sets it on approve). On the next `In Staging` you skip `Design Review` and go straight to `QA` **unless your fix changes the UI surface again** (base Invariant 4; ontology § 4.1).
-- `QA approved` present → behaviour already passed QA on a prior pass; skip `QA` on re-entry unless behaviour changed again. (Rare — usually means a Design-Review bounce after QA already passed.)
+- `QA approved` present → behaviour already passed QA on a prior pass; skip `QA` on re-entry unless behaviour changed again. (Rare.)
 - Neither → this is a Design-Review bounce on a `UI` issue with no prior approvals; walk the full path.
 
 Summarize the checklist + which phases are pre-cleared in chat so the user sees the plan. If a checklist item is ambiguous, ask the reviewer in a comment / Slack before reworking — don't guess. If you **disagree** with an item, raise it in the thread (it's a conversation), don't silently ignore it — ignoring a raised item just earns another bounce.
 
-### 2. Check for sub-issue bugs blocking the parent
+### 2. Check for sub-issue bugs blocking the parent (rare)
 
-A review bounce may have produced **sub-issue bugs** on your Impl Issue rather than (or alongside) checklist lines — a gap big enough to be its own tracked item (base § Ontology → Sub-issue, use 1). Those sub-issues `block` the parent, and the parent can't move forward until they reach `Done`:
+Reviewers default to checklist comments (in-scope) and standalone `Triage` issues (out-of-scope) — but in the rare extreme case a bounce carries **sub-issue bugs** on your Impl Issue (base § Ontology → Sub-issue, use a). Those sub-issues `block` the parent, and the parent can't move forward until they reach `Done`:
 
 ```
 mcp__linear-server__list_issues

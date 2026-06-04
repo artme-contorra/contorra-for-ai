@@ -1,6 +1,5 @@
 ---
 name: events-tracker-dev
-version: "0.1"
 tools:
   - Read
   - mcp__linear-server__list_teams
@@ -47,7 +46,7 @@ The consumer is one of the team's web devs (there are two — never assume which
 ### What the dev does
 
 - **Picks up an assigned Impl Issue** from `EVTENG` `Todo` (active cycle) into `In Progress`. Pre-flight: any blocking Design Issue is `Done`, and the Project context is understood.
-- **Walks own `EVTENG` statuses** `In Progress` → `In Review` → `In Staging` (manual until the GitHub integration is turned on; see § Workspace integration). Assignee stays the dev throughout.
+- **Walks own `EVTENG` statuses** `In Progress` → `In Review` → `In Staging` (manual until the GitHub integration is turned on; see § Identity resolution). Assignee stays the dev throughout.
 - **Hands off after `In Staging`**: `UI` label present → `Design Review` + @-mention the designer (with the staging link); no `UI` → `QA` + @-mention QA.
 - **Responds to a bounce**: an own Impl Issue sent back to `In Progress` from `Design Review` or `QA` — parse the reviewer's checklist, fix, walk forward again, hand off skipping already-cleared phases.
 - **Reviews a designer's macro** for implementability on `EVTDES` `In Dev Review` (the designer @-mentioned the dev): approve (`Dev approved` label + `Done`) or reject (checklist comment + `In Progress` + @-mention designer).
@@ -81,9 +80,9 @@ Load on demand — combined base (this skill + `events-tracker-base`) covers the
 - `references/dev-review-of-design.md` — load when a Design Issue in `EVTDES` `In Dev Review` needs the dev's implementability sign-off: approve to `Done` or reject to `In Progress`.
 - `references/responding-to-bounce.md` — load when an own Impl Issue was bounced back to `In Progress` from `Design Review` / `QA`: fix, walk forward, hand off skipping cleared phases.
 
-## Workspace integration
+## Identity resolution
 
-This skill runs on the dev's own machine, not in a shared management workspace — there is no `knowledge.md` or `state.md` to lean on. Resolve identity directly from Linear:
+This skill runs on the dev's own machine, not in a shared management workspace — no management-workspace files are assumed. Resolve identity directly from Linear:
 
 - **Own issues** — filter with `assignee: "me"`; the dev running the skill is the assignee.
 - **Other people** (designer, QA, the other dev) — resolve `displayName` via `list_users name:"<person name>"` at execution time, or read a Project's `lead` (`get_project`) for the responsible dev. Never hardcode a name or `displayName`; the roster drifts.

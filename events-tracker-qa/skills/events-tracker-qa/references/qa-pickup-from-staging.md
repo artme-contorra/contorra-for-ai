@@ -2,7 +2,7 @@
 
 Recipe for QA's entry flow: an Impl Issue sits in `EVTENG` `QA` (the dev or designer @-mentioned QA after staging), read the issue + comments for context, then plan and run the test pass on the staging build. Loaded on demand from `events-tracker-qa` → `SKILL.md` → § References pointer. Entry-point trigger: "что мне на QA", "прогони EVTENG-N на стейджинге", "what's waiting for QA", "test this on staging".
 
-Out of scope: the verdict itself — approve / reject / sub-issue bugs live in `qa-review-of-impl.md`. Issues in any status other than `QA` — QA only touches an Impl Issue on this review call (`SKILL.md` → § Role scope → What QA does NOT do). `EVTDES` Design Issues — not QA's board.
+Out of scope: the verdict itself — approve / reject / findings routing live in `qa-review-of-impl.md`. Issues in any status other than `QA` — QA only touches an Impl Issue on this review call (`SKILL.md` → § Role scope → What QA does NOT do). `EVTDES` Design Issues — not QA's board.
 
 This step is all reads — no confirmation needed. The writes come at the verdict.
 
@@ -51,14 +51,14 @@ From step 2, decide what to exercise on staging. Typical pass:
 - **Happy path** — the primary flow the change enables / fixes, end to end on staging.
 - **Edge / error cases** — empty states, invalid input, boundary conditions the change touches.
 - **Regression around the change** — adjacent behaviour that could break (esp. on critical paths: auth, scoring, payments, registration, calendar).
-- **Cross-surface** — if the change spans web behaviour the issue calls out, exercise each.
+- **Cross-surface** — if the issue calls out multiple surfaces (e.g., organizer view vs player view), exercise each.
 - **Acceptance against the ask** — does it actually do what the issue / Project description says it should.
 
 State the plan in chat (one or two lines) so the user can add cases before you run.
 
 ### 5. Run on staging
 
-Walk the plan on the staging build deliberately. Note each finding as you go — what, where, expected vs. actual, repro steps. These become the verdict input: clean → approve; deviations → either the rejection checklist or sub-issue bugs (see `qa-review-of-impl.md` for the bug-vs-checklist boundary).
+Walk the plan on the staging build deliberately. Note each finding as you go — what, where, expected vs. actual, repro steps. These become the verdict input: clean → approve; in-scope deviations → the rejection checklist; out-of-scope findings → standalone `Triage` issues (see `qa-review-of-impl.md` for the routing).
 
 ### 6. Hand to the verdict
 

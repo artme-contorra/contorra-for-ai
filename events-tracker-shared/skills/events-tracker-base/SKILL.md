@@ -1,6 +1,5 @@
 ---
 name: events-tracker-base
-version: "0.1"
 tools:
   - Read
   - mcp__linear-server__list_teams
@@ -86,7 +85,7 @@ Canonical source (in the management workspace): `research/processes/2026-06-04_e
 - **Issue** — single assignee, discrete unit.
   - *Inside Project:* role-split into Design Issue (`EVTDES`, assignee = designer) + Impl Issue (`EVTENG`, assignee = dev). Description minimal or skipped — context lives in Project description.
   - *Outside Project:* ad-hoc (bug / chore / polish). **Description required** — no Project context to lean on. Default for small / one-off work.
-- **Sub-issue** — three valid uses only: (a) bug surfaced in `Design Review` / `QA` (parent stays in review until sub-issue → `Done`); (b) explicit blocker ("waiting on X to do Y"; owner = the person being waited on); (c) rare size-split. Default: not used.
+- **Sub-issue** — extreme cases only; default: not used. Three valid uses: (a) rare in-scope review gap that must be its own tracked item while still blocking the parent (parent stays in review until sub-issue → `Done`) — **not** the default review outcome, which is checklist comment + bounce (in-scope) or a new standalone `Triage` issue (out-of-scope); (b) explicit blocker ("waiting on X to do Y"; owner = the person being waited on); (c) rare size-split.
 
 ### Statuses
 
@@ -126,7 +125,7 @@ GitHub integration (branch → `In Progress`, ready → `In Review`, merge → `
 
 | Label | Casing | Set by | When |
 |---|---|---|---|
-| `bug` / `feature` / `chore` / `tech-debt` | lowercase | PM at create / Triage sweep | Mandatory exactly-one. Linear **label group** `Type` enforces mutual exclusion natively. |
+| `bug` / `feature` / `chore` / `tech-debt` | lowercase | PM — at create (own issues) or at Triage sweep (incoming) | Mandatory exactly-one. Linear **label group** `Type` enforces mutual exclusion natively. |
 | `UI` | all caps | PM at create | Impl Issue changes the UI and needs a `Design Review` pass. Assignee can dispute via comment + label removal. |
 | `Design approved` | Title case | Designer | Set on `Design Review` → `QA` approve. Survives bounces — a later QA reject doesn't undo it. |
 | `QA approved` | Title case | QA | Set on `QA` → `Done` approve. Survives bounces. |
@@ -151,8 +150,12 @@ Linear native 0–4: `0` None / `1` Urgent / `2` High / `3` Medium / `4` Low. Re
 ### Blocking relations
 
 - **Design Issue → `blocks` → Impl Issue.** PM sets at create time when making a Project pair. Design must reach `Done` for the relation to release Impl from being blocked.
-- **Sub-issue bugs from review** implicitly block their parent (parent stays in review status until all sub-issues close).
+- **Sub-issue bugs from review** (extreme case — see § Entity gradient) implicitly block their parent (parent stays in review status until all sub-issues close).
 - `blockedBy` / `blocks` on `save_issue` are **append-only** — to remove a relation use `removeBlockedBy` / `removeBlocks`. See § MCP-tool guide.
+
+### Saved views (human entry points)
+
+The team's curated Linear views (per ontology canon § 7): **Triage**, **My active** (assignee = me, active statuses), **Current cycle**, **By Project**, **In flight** (`In Review` / `In Staging` / `Design Review` / `QA`). These are human board entry points — agents reconstruct the same slices with `list_issues` filters and don't depend on the views existing.
 
 ### Brevity rule (descriptions)
 
@@ -202,7 +205,8 @@ Required for create: `team`, `title`. Common pattern:
 
 - Pass `id` (e.g. `"EVTENG-3"`). Omitting `id` creates a new issue.
 - **Status transitions go through `state`** — `state: "Done"` / `"In Progress"` / `"Design Review"` etc. Accepts state type (`"completed"`), name, or ID.
-- `blockedBy` / `blocks` / `relatedTo` are **append-only** — passing them again does **not** replace the set. Use `removeBlockedBy` / `removeBlocks` / `removeRelatedTo` to remove. This avoids silently wiping someone else's added relation.
+- `labels` is **replace-semantics** — passing `labels` overwrites the issue's whole label set. Re-send the existing labels plus your addition (e.g. existing + `"Design approved"`), or you'll silently wipe the `Type` label / `UI` / earlier markers.
+- `blockedBy` / `blocks` / `relatedTo` are **append-only** (contrast `labels` above) — passing them again does **not** replace the set. Use `removeBlockedBy` / `removeBlocks` / `removeRelatedTo` to remove. This avoids silently wiping someone else's added relation.
 
 ### `save_project`
 

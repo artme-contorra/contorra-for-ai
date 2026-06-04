@@ -40,7 +40,7 @@ Walk the implemented UI against the macro deliberately. Typical checklist:
 - **Responsive** — behaves at the breakpoints the macro covers.
 - **Interaction** — transitions / animations as designed.
 
-Note each deviation as you go — these become either the rejection checklist or sub-issue bugs.
+Note each deviation as you go — in-scope ones become the rejection checklist; out-of-scope findings become standalone `Triage` issues (step 5).
 
 ### 4a. Approve → `QA`
 
@@ -89,25 +89,28 @@ mcp__linear-server__save_issue
 
 The dev (assignee) is @-mentioned. Do **not** set `Design approved` on a reject. Don't reassign — the dev owns it. The dev addresses the checklist and re-enters the flow (their `responding-to-bounce` flow); `Design approved` only gets set when the impl actually passes.
 
-### 5. Sub-issue bugs (gap too big for a checklist line)
+### 5. Out-of-scope findings → new Triage issue; sub-issue only in extreme cases
 
-For a deviation large enough to be its own tracked item rather than a checklist bullet — a real bug, not a polish nit — create a **sub-issue on the Impl Issue** (base § Ontology → Sub-issue, use 1: bug surfaced in `Design Review`). The parent stays in its review phase until the sub-issue reaches `Done`.
+**In-scope deviations belong in the rejection checklist (4b)** — that's the default. Two non-default cases:
+
+**Out-of-scope finding** (a bug or gap noticed during review that isn't part of this issue's scope): create a **new standalone `EVTENG` issue** — no `parentId`, doesn't block the parent, doesn't hold the review.
 
 ```
 mcp__linear-server__save_issue
   team: "Events Engineering"
-  title: "<the bug — standalone-readable>"
-  description: "<repro / expected vs actual / macro reference>"
-  parentId: "EVTENG-N"
+  title: "<the finding — standalone-readable>"
+  description: "<repro / expected vs actual / where it was noticed>"
   labels: ["bug"]
 ```
 
-Note: a designer-created `EVTENG` issue lands in `Triage` (base Invariant 2 — only the PM skips Triage). The sub-issue still `blocks` its parent from there, but it sits unrouted until the PM sweep — so always @-mention the dev and PM in the review comment with the new `EVTENG-N`, so the block is visible immediately and routing doesn't wait for the sweep. Description is **required** and **English** (Invariant 5). Use a sub-issue only when the gap genuinely warrants a tracked item — most deviations belong in the rejection checklist (4b), not as sub-issues.
+A designer-created `EVTENG` issue lands in `Triage` (base Invariant 2 — only the PM skips it); the PM routes it at sweep. Description is **required** and **English** (Invariant 5).
+
+**Extreme case — in-scope gap that must be its own tracked item** while still blocking the parent: same call but with `parentId: "EVTENG-N"` (base § Ontology → Sub-issue, use a). The parent stays in its review phase until the sub-issue reaches `Done`; @-mention the dev and PM in the review comment with the new `EVTENG-N` so the block is visible before the sweep. This is rare — reach for the checklist first.
 
 ### 6. Echo result in chat
 
 - `EVTENG-N` → `QA` (approved, `Design approved` set, QA @-mentioned) **or** → `In Progress` (rejected, checklist posted, dev @-mentioned).
-- Any sub-issue bugs created, with their `EVTENG-N`.
+- Any out-of-scope findings filed to `Triage` (their `EVTENG-N`); in the rare sub-issue case, a note that the parent stays blocked until it closes.
 
 ## Notes
 

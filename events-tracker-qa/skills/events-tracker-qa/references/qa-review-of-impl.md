@@ -59,29 +59,28 @@ mcp__linear-server__save_issue
 
 The `<dev displayName>` is the assignee — @-mention by `displayName` (resolve via `list_users name:"<dev name>"` only if it isn't already to hand). Do **not** set `QA approved` on a reject. Don't reassign — the dev owns it (Invariant 1). The dev addresses the checklist and walks the issue forward again; `Design approved` (if present) survives, so a non-UI fix can come back straight to `QA` (Invariant 4).
 
-## 2. Sub-issue bugs — gap too big for a checklist line
+## 2. Out-of-scope findings → new Triage issue; sub-issue only in extreme cases
 
-For a finding large enough to be its own tracked item — a real bug worth following independently, not a polish nit or a one-line fix — create a **sub-issue on the Impl Issue under test** (base § Ontology → Sub-issue, use 1: bug surfaced in `QA`). The parent stays in `QA` until the blocking sub-issues reach `Done`.
+**In-scope findings belong in the rejection checklist (1b)** — that's the default. Two non-default cases:
+
+**Out-of-scope finding** (broken behaviour noticed while testing that isn't part of this issue's scope): create a **new standalone `EVTENG` issue** — no `parentId`, doesn't block the parent, doesn't hold the verdict.
 
 ```
 mcp__linear-server__save_issue
   team: "Events Engineering"
-  title: "<the bug — standalone-readable>"
+  title: "<the finding — standalone-readable>"
   description: "<repro / expected vs. actual / staging reference>"
-  parentId: "EVTENG-N"
   labels: ["bug"]
 ```
 
-Judgment call — the boundary is the same as the designer's: **most findings belong in the rejection checklist (1b), not as sub-issues.** A sub-issue is for the gap that genuinely warrants its own item. Notes:
+A QA-created `EVTENG` issue lands in `Triage` (base Invariant 2 — only the PM skips it); the PM routes it at sweep. `description` is **required** and **English** (Invariant 5). An out-of-scope finding alone is not a reason to reject — if the issue's own scope passes, approve and file the finding separately.
 
-- A QA-created `EVTENG` issue lands in `Triage` (base Invariant 2 — only the PM skips Triage). The sub-issue still blocks its parent from there, but it sits unrouted until the PM sweep — so always @-mention the dev (assignee) and PM in the comment with the new `EVTENG-N`, so the block is visible immediately and routing doesn't wait.
-- `description` is **required** on a sub-issue and **English** (Invariant 5).
-- When you file sub-issue bugs, the parent doesn't go to `Done` — it stays in `QA` (blocked) until they close. Don't approve a parent with open QA sub-issues.
+**Extreme case — in-scope gap that must be its own tracked item** while still blocking the parent: same call but with `parentId: "EVTENG-N"` (base § Ontology → Sub-issue, use a). The parent stays in `QA` (blocked) until the sub-issue reaches `Done` — don't approve a parent with open QA sub-issues. @-mention the dev (assignee) and PM with the new `EVTENG-N` so the block is visible before the sweep. This is rare — reach for the checklist first.
 
 ## 3. Echo result in chat
 
 - `EVTENG-N` → `Done` (approved, `QA approved` set, **released to prod**) **or** → `In Progress` (rejected, checklist posted, dev @-mentioned).
-- Any sub-issue bugs created, with their `EVTENG-N`, and a note that the parent stays in `QA` until they close.
+- Any out-of-scope findings filed to `Triage` (their `EVTENG-N`); in the rare sub-issue case, a note that the parent stays in `QA` until it closes.
 
 ## Notes
 
@@ -89,4 +88,4 @@ Judgment call — the boundary is the same as the designer's: **most findings be
 - **`QA approved` is QA's label; `Design approved` and `Dev approved` are not.** `Design approved` is the designer's (on `Design Review`); `Dev approved` is the dev's (on `EVTDES` `In Dev Review`). On `EVTENG`, QA sets only `QA approved` (base § Labels).
 - **Marker labels survive bounces.** `QA approved` (and any `Design approved` already present) persist across a reopen; the next pass skips the cleared phase unless the relevant surface actually changed (Invariant 4). QA doesn't re-clear them.
 - **Never reassign on either branch.** Approve or reject, the assignee stays the dev (Invariant 1). The @-mention + status change is the signal.
-- **English only** (Invariant 5) — comments and any Triage-arriving sub-issue content, regardless of chat language.
+- **English only** (Invariant 5) — comments and any Triage-arriving issue content, regardless of chat language.
