@@ -1,5 +1,6 @@
 {
   "name": "contorra-for-ai",
+  "description": "Contorra internal plugins for AI-assisted work: Events tracker roles (PM / dev / designer / QA) and shared base.",
   "owner": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"
