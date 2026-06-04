@@ -13,6 +13,7 @@ All steps run in chat. Single confirmation in step 6 covers the batch (Project +
 Pull the feature name and the scope of work from conversation context. Confirm in chat:
 
 - **Title** for the Project (Title Case, scannable; not a sentence). Examples: `Tournament leaderboard live updates`, `Inline AI assistant — round 1`.
+- **Titles for the two Issues** — each names its own deliverable, readable without the Project context (see § Issue titles below). Draft both here; confirm with the rest of the batch.
 - **One-paragraph description** for the Project: the problem, the scope, what "done" looks like. This is the shared context for both Issues (per the brevity rule — see `SKILL.md` → § Ontology — condensed → Brevity rule).
 - **Responsible dev** — one of the `EVTENG` devs. They will be Project lead and Impl Issue assignee.
 - **Initiative** — `Stability`, `AI Platform`, `UX`, or none. Most cross-role features attach to one. If unclear, ask: "под какую initiative — `Stability` / `AI Platform` / `UX` / без?".
@@ -28,10 +29,25 @@ Resolve the designer's `displayName` the same way for use in `assignee` on the D
 
 The skill intentionally doesn't hardcode handles — they drift when the roster or Linear identities change.
 
+### Issue titles — self-sufficient, not suffixed
+
+Each Issue title names **its own deliverable**, readable standalone on the team's board without opening the Project:
+
+- **Design Issue** — names the design scope: which flows / screens / macros. What is being *designed*, not which feature it belongs to.
+- **Impl Issue** — names the shippable behaviour: what the user (or the system) gets.
+
+Anti-patterns: identical titles across the pair; mechanical ` — design` / ` — impl` suffixes; titles that only make sense inside the Project view.
+
+Example — Project `Customizable team names`:
+- Design Issue: `Team rename flow & settings UI`
+- Impl Issue: `Custom team names in event settings`
+
+If the two titles come out near-identical, the split hasn't been thought through yet — ask what the design actually covers vs what the impl actually ships.
+
 ### 3. Draft the Design Issue (`EVTDES`)
 
 - `team: "Events Design"`.
-- `title` — same as Project, optionally suffixed with ` — design` if the Project title alone reads ambiguous in the Design board. Default: bare Project title.
+- `title` — per § Issue titles above: the design deliverable, standalone.
 - `description` — minimal or skipped (context lives in Project description). If a one-line pointer helps the designer, add a single sentence like `Design for the [Project title] feature; see Project description.`.
 - `state: "Backlog"`. PM creates skip Triage; `EVTDES` has no Triage anyway.
 - `assignee: "<designer displayName>"` — resolved in step 2.
@@ -42,7 +58,7 @@ The skill intentionally doesn't hardcode handles — they drift when the roster 
 ### 4. Draft the Impl Issue (`EVTENG`)
 
 - `team: "Events Engineering"`.
-- `title` — same as Project, optionally suffixed with ` — impl`. Default: bare Project title.
+- `title` — per § Issue titles above: the shippable behaviour, standalone.
 - `description` — minimal or skipped (same reason).
 - `state: "Backlog"` (PM creates skip Triage). If pre-committed for the active cycle, use `state: "Todo"` + `cycle: "<n>"` — but Backlog is the safer default; let cycle planning pull it.
 - `assignee: "<dev displayName>"` — resolved in step 2.
