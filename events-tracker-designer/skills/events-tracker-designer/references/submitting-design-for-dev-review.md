@@ -26,7 +26,7 @@ Check: `state` is `In Progress`, `assignee` is the designer. If it's still `Todo
 The reviewer is the **Project lead** — the dev who owns the dependent Impl Issue (base § Map: Project lead = responsible dev). Resolve their Linear `displayName`:
 
 - If the Design Issue is in a Project, read the Project's `lead`: `get_project name:"<Project name>"` (or follow `project` from `get_issue` in step 1).
-- Otherwise resolve from `knowledge.md` § Team or `list_users name:"<dev name>"`.
+- Otherwise resolve via `list_users name:"<dev name>"` (see `SKILL.md` → § Identity resolution).
 
 Don't hardcode a dev name — the roster and Linear identities drift. If two devs and it's unclear which owns the impl, ask in one turn: "which dev reviews this — <X> or <Y>?".
 

@@ -34,7 +34,7 @@ Track which items are resolved against the dev's checklist so the re-submission 
 
 ### 3. Re-submit to `In Dev Review`
 
-Once the checklist is addressed, return the issue to `In Dev Review` and @-mention the same dev with what changed. Resolve the dev's `displayName` (Project lead — from the Project `lead`, `knowledge.md` § Team, or `list_users`; don't hardcode). Confirm, then:
+Once the checklist is addressed, return the issue to `In Dev Review` and @-mention the same dev with what changed. Resolve the dev's `displayName` (Project `lead` via `get_project`, or `list_users`; don't hardcode — see `SKILL.md` → § Identity resolution). Confirm, then:
 
 ```
 # 1. Re-submit comment, @-mention the dev, speak to the checklist

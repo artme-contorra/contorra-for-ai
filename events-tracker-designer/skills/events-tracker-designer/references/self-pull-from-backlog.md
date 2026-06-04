@@ -34,7 +34,7 @@ If the user named a specific issue, skip the ranking and go straight to it. Othe
 
 ### 3. Self-assign + transition to `Todo`
 
-This is the **one self-assign moment** in the designer's flow (resolved in ontology § 10 — self-assignment happens at `Backlog` → `Todo`). Resolve the designer's own Linear `displayName` from `knowledge.md` § Team or via `list_users name:"<designer name>"` — or pass `"me"` (the designer is the one running this skill). Don't hardcode a name.
+This is the **one self-assign moment** in the designer's flow (self-assignment happens at `Backlog` → `Todo`). Pass `assignee: "me"` — the designer is the one running this skill. Don't hardcode a name.
 
 Confirm in chat, then one write:
 

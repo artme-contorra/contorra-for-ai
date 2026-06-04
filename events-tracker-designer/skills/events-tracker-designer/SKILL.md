@@ -71,11 +71,12 @@ Load on demand — combined base (this skill + `events-tracker-base`) covers the
 - `references/design-review-of-impl-issue.md` — load when reviewing an Impl Issue in `EVTENG` `Design Review` against the Figma macro: approve to `QA` or reject to `In Progress`.
 - `references/handling-dev-rejection-of-design.md` — load when an own Design Issue is bounced from `In Dev Review` back to `In Progress`: address the checklist, return to `In Dev Review`.
 
-## Workspace integration
+## Identity resolution
 
-- `knowledge.md` — canon on team members (roles, working rhythm, traits, Linear `displayName`). Resolve the responsible dev and QA `displayName` from here or via `list_users`; update there, not in this skill.
-- `state.md` — current focus; may reference specific `EVTDES-N` / `EVTENG-N` items.
-- `linear-context` — **deprecated** for Events work; still owns Artem's personal `CON` tracker. Don't widen this skill to cover `CON`.
-- `jira-context` — out of scope. Jira `EV` is being superseded by this Linear setup.
-- `slack-context` — orthogonal. `@-mention` syntax in Linear uses `displayName`; Slack handles + UserIDs are different identifiers in `slack-context`.
-- `github-context` — orthogonal. Branch / PR / staging conventions described there; tracker side described here.
+This skill runs on the designer's own machine — no management-workspace files are assumed. Resolve Linear identities at execution time:
+
+- **Self** — `assignee: "me"` / the authenticated Linear user.
+- **The responsible dev** — the Project's `lead` (via `get_project`), or the Impl Issue's assignee (via `get_issue`), or `list_users name:"<dev name>"`.
+- **QA** — `list_users name:"<QA name>"`; ask the user once per session if ambiguous.
+
+Slack handles are different identifiers — Linear `@-mention` uses the Linear `displayName` only.

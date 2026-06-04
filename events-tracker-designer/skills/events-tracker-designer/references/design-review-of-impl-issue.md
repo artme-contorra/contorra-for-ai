@@ -46,7 +46,7 @@ Note each deviation as you go — these become either the rejection checklist or
 
 If the impl matches the macro (or deviations are negligible and intentional), approve. This sets the `Design approved` marker and hands off to QA — it does **not** go to `Done` (that's QA's call after the `QA` phase).
 
-Resolve QA's `displayName` (`knowledge.md` § Team or `list_users name:"<QA name>"`). Confirm, then:
+Resolve QA's `displayName` via `list_users name:"<QA name>"` (see `SKILL.md` → § Identity resolution). Confirm, then:
 
 ```
 # 1. Approve comment, @-mention QA
