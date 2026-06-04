@@ -20,6 +20,16 @@
       "name": "events-tracker-designer",
       "source": "./events-tracker-designer",
       "description": "Designer role for the Events tracker — self-pull Design Issues, submit for dev review, respond to bounces, review impl on staging in Design Review."
+    },
+    {
+      "name": "events-tracker-dev",
+      "source": "./events-tracker-dev",
+      "description": "Developer role for the Events tracker — pick up Impl Issues, walk statuses to staging, hand off to Design Review / QA, respond to bounces, review designs for implementability."
+    },
+    {
+      "name": "events-tracker-qa",
+      "source": "./events-tracker-qa",
+      "description": "QA role for the Events tracker — pick up Impl Issues in QA on staging, approve to Done (release gate) or reject with checklist, file sub-issue bugs."
     }
   ]
 }
