@@ -1,6 +1,6 @@
 {
   "name": "events-tracker-pm",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "PM / tracker-owner role for the Events tracker (Linear EVTENG + EVTDES). Project pair creation, Triage sweep, cycle planning. Depends on events-tracker-shared for the base ontology.",
   "author": {
     "name": "Artem Kononov",
