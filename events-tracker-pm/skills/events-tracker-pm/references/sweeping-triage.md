@@ -66,6 +66,10 @@ For Triage-incoming items the creator (often a teammate or support) usually didn
 
 The entry came from a non-PM and may be thin. If the conversation surfaces extra context (cause, reproduction steps, related issue, link), append a single `## Update YYYY-MM-DD` section to the description and confirm in the same batch. Don't strip the original author's text — append, don't overwrite. The goal: new context surfaced during sweep lands somewhere, not on the floor.
 
+#### 2g. Language
+
+Tracker language is English (base Invariant 5). If the entry's title or description came in Russian, translate both as part of the sweep — title always; description translated rather than appended (this is the one case where rewriting the author's text is correct; keep the meaning, note `*(translated from Russian at triage)*` at the bottom if the original phrasing might matter).
+
 ### 3. Show draft + confirm + transition
 
 For each entry, present the batch:

@@ -166,6 +166,7 @@ These hold across the entire tracker. Violations break downstream conventions.
 2. **Triage routing is `EVTENG` only.** All non-PM-created `EVTENG` issues land in `Triage`. PM sweep (daily or as items arrive) sets priority, type label, project, assignee, then transitions to `Backlog` (or `Todo` + cycle if pre-committed). PM-created issues skip `Triage`. `EVTDES` has no `Triage` — ad-hoc design requests come via Slack and the PM creates the issue directly in `Backlog`.
 3. **`UI` label semantics.** PM sets `UI` at creation when the Impl Issue changes the user interface and needs a `Design Review` pass. The assignee (dev) can dispute via comment + label removal; PM should not silently re-set it. Lives outside the `Type` group.
 4. **Marker labels persist across bounces.** `Design approved`, `QA approved`, `Dev approved` survive when an issue bounces back to `In Progress` from a later review. The next `In Staging` skips the already-cleared phase unless the relevant surface actually changed again. Re-entry doesn't redo passed gates.
+5. **Tracker language is English.** All tracker content — titles, descriptions, comments — is written in English, regardless of the conversation language around it. The tracker is the English-language canonical record; Slack and meetings can be Russian. Items that arrive in Russian (e.g., Triage submissions) get translated when processed.
 
 ## MCP-tool guide
 
