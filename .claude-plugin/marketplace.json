@@ -15,6 +15,11 @@
       "name": "events-tracker-pm",
       "source": "./events-tracker-pm",
       "description": "PM / tracker-owner role for the Events tracker — Project pair creation, Triage sweep, cycle planning."
+    },
+    {
+      "name": "events-tracker-designer",
+      "source": "./events-tracker-designer",
+      "description": "Designer role for the Events tracker — self-pull Design Issues, submit for dev review, respond to bounces, review impl on staging in Design Review."
     }
   ]
 }
