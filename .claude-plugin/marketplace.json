@@ -1,0 +1,19 @@
+{
+  "name": "contorra-for-ai",
+  "owner": {
+    "name": "Artem Kononov",
+    "email": "ak@contorra.com"
+  },
+  "plugins": [
+    {
+      "name": "events-tracker-shared",
+      "source": "./events-tracker-shared",
+      "description": "Map / ontology / invariants / MCP-tool guide for the Events tracker in Linear. Auto-loaded as a dependency of any events-tracker-* role plugin."
+    },
+    {
+      "name": "events-tracker-pm",
+      "source": "./events-tracker-pm",
+      "description": "PM / tracker-owner role for the Events tracker — Project pair creation, Triage sweep, cycle planning."
+    }
+  ]
+}
