@@ -1,6 +1,6 @@
 {
   "name": "events-tracker-shared",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Map, ontology, invariants, and Linear MCP-tool guide for the Events tracker (teams EVTENG + EVTDES). Auto-loaded as a dependency of any events-tracker-* role plugin. Bundles the Linear MCP server.",
   "author": {
     "name": "Artem Kononov",

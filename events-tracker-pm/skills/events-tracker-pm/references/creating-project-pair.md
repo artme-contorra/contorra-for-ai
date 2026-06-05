@@ -29,18 +29,19 @@ Resolve the designer's `displayName` the same way for use in `assignee` on the D
 
 The skill intentionally doesn't hardcode handles — they drift when the roster or Linear identities change.
 
-### Issue titles — self-sufficient, not suffixed
+### Issue titles — verb-led imperatives, the verb carries the role
 
-Each Issue title names **its own deliverable**, readable standalone on the team's board without opening the Project:
+Every Issue title is an **imperative naming its own deliverable**, readable standalone on the team's board without opening the Project. The first word makes the role visible:
 
-- **Design Issue** — names the design scope: which flows / screens / macros. What is being *designed*, not which feature it belongs to.
-- **Impl Issue** — names the shippable behaviour: what the user (or the system) gets.
+- **Design Issue** — starts with a design verb (`Design`, `Prototype`, `Explore`) + the actual design scope: which flows / screens / states.
+- **Impl Issue** — starts with a build verb (`Add`, `Build`, `Support`, `Fix`, `Migrate`) + the shippable behaviour: what the user (or the system) gets.
 
-Anti-patterns: identical titles across the pair; mechanical ` — design` / ` — impl` suffixes; titles that only make sense inside the Project view.
+Anti-patterns: identical or near-identical titles across the pair; mechanical ` — design` / ` — impl` suffixes or `Design /` tags; titles that only make sense inside the Project view.
 
-Example — Project `Customizable team names`:
-- Design Issue: `Team rename flow & settings UI`
-- Impl Issue: `Custom team names in event settings`
+Examples:
+
+- Project `Customizable team names`: Design `Design team rename flow & settings UI` · Impl `Add custom team names to event settings`
+- Project `Additional formats`: Design `Design scorecard layouts for best-2/3-of-4` · Impl `Support best 2-ball / best 3 of 4 / high-low scoring`
 
 If the two titles come out near-identical, the split hasn't been thought through yet — ask what the design actually covers vs what the impl actually ships.
 

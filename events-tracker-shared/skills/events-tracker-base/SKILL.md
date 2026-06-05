@@ -157,6 +157,10 @@ Linear native 0–4: `0` None / `1` Urgent / `2` High / `3` Medium / `4` Low. Re
 
 The team's curated Linear views (per ontology canon § 7): **Triage**, **My active** (assignee = me, active statuses), **Current cycle**, **By Project**, **In flight** (`In Review` / `In Staging` / `Design Review` / `QA`). These are human board entry points — agents reconstruct the same slices with `list_issues` filters and don't depend on the views existing.
 
+### Issue titles — verb-led imperatives
+
+Every Issue title is an imperative naming its own deliverable, standalone-readable. The verb carries the role: Design Issues start with a design verb (`Design`, `Prototype`, `Explore`) + design scope; Impl and ad-hoc issues start with a build verb (`Add`, `Build`, `Support`, `Fix`, `Migrate`) + the shippable behaviour. No ` — design` / ` — impl` suffixes, no duplicating the Project name across a pair. E.g. `Design team rename flow & settings UI` / `Add custom team names to event settings`.
+
 ### Brevity rule (descriptions)
 
 One paragraph at most on Project and on out-of-Project Issues. **In-Project Issues:** description minimal or skipped — context lives in the Project description. Detail belongs in linked design docs, PR descriptions, or comments, not in the canonical entity body. Never edit a description to reflect status (status lives in state + comments).
