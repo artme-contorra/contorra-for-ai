@@ -1,6 +1,6 @@
 # Creating a Project pair (Design + Impl)
 
-Recipe for the PM's most choreographed flow: a Project spanning design + impl, with a Design Issue in `EVTDES` and an Impl Issue in `EVTENG`, linked by `blocks`. Loaded on demand from `events-tracker-pm` → `SKILL.md` → § References pointer. Entry-point trigger: "new feature for Events that needs design + impl", "create a project with design and impl tickets", "поставь дизайн + impl для X".
+Recipe for the PM's most choreographed flow: a Project spanning design + impl, with a Design Issue in `DES` and an Impl Issue in `ENG`, linked by `blocks`. Loaded on demand from `events-tracker-pm` → `SKILL.md` → § References pointer. Entry-point trigger: "new feature for Events that needs design + impl", "create a project with design and impl tickets", "поставь дизайн + impl для X".
 
 Out of scope: out-of-Project ad-hoc work (use Triage sweep instead — see `sweeping-triage.md`), Project edits, archive.
 
@@ -15,7 +15,7 @@ Pull the feature name and the scope of work from conversation context. Confirm i
 - **Title** for the Project (Title Case, scannable; not a sentence). Examples: `Tournament leaderboard live updates`, `Inline AI assistant — round 1`.
 - **Titles for the two Issues** — each names its own deliverable, readable without the Project context (see § Issue titles below). Draft both here; confirm with the rest of the batch.
 - **One-paragraph description** for the Project: the problem, the scope, what "done" looks like. This is the shared context for both Issues (per the brevity rule — see `SKILL.md` → § Ontology — condensed → Brevity rule).
-- **Responsible dev** — one of the `EVTENG` devs. They will be Project lead and Impl Issue assignee.
+- **Responsible dev** — one of the `ENG` devs. They will be Project lead and Impl Issue assignee.
 - **Initiative** — `Stability`, `AI Platform`, `UX`, or none. Most cross-role features attach to one. If unclear, ask: "под какую initiative — `Stability` / `AI Platform` / `UX` / без?".
 - **Priority** — `1` Urgent, `2` High, `3` Medium (default), `4` Low.
 
@@ -45,18 +45,18 @@ Examples:
 
 If the two titles come out near-identical, the split hasn't been thought through yet — ask what the design actually covers vs what the impl actually ships.
 
-### 3. Draft the Design Issue (`EVTDES`)
+### 3. Draft the Design Issue (`DES`)
 
 - `team: "Events Design"`.
 - `title` — per § Issue titles above: the design deliverable, standalone.
 - `description` — minimal or skipped (context lives in Project description). If a one-line pointer helps the designer, add a single sentence like `Design for the [Project title] feature; see Project description.`.
-- `state: "Backlog"`. PM creates skip Triage; `EVTDES` has no Triage anyway.
+- `state: "Backlog"`. PM creates skip Triage; `DES` has no Triage anyway.
 - `assignee: "<designer displayName>"` — resolved in step 2.
 - `priority` — same as the Project unless there's a reason to diverge.
 - `project: "<Project name>"` — attach after Project is created (see step 6 ordering).
 - No labels at create (`Dev approved` is set later by the dev on approval).
 
-### 4. Draft the Impl Issue (`EVTENG`)
+### 4. Draft the Impl Issue (`ENG`)
 
 - `team: "Events Engineering"`.
 - `title` — per § Issue titles above: the shippable behaviour, standalone.
@@ -95,7 +95,7 @@ mcp__linear-server__save_project
   addInitiatives: ["Stability"]        # or "AI Platform" / "UX" / omit
   priority: 3                          # 0–4, defaults to Medium
 
-# 2. Create the Design Issue (EVTDES)
+# 2. Create the Design Issue (DES)
 mcp__linear-server__save_issue
   team: "Events Design"
   title: "<title>"
@@ -105,7 +105,7 @@ mcp__linear-server__save_issue
   priority: 3
   project: "<Project name>"
 
-# 3. Create the Impl Issue (EVTENG)
+# 3. Create the Impl Issue (ENG)
 mcp__linear-server__save_issue
   team: "Events Engineering"
   title: "<title>"
@@ -118,15 +118,15 @@ mcp__linear-server__save_issue
 
 # 4. Set the blocks relation: Design → Impl
 mcp__linear-server__save_issue
-  id: "<EVTDES-N from step 2>"
-  blocks: ["<EVTENG-N from step 3>"]
+  id: "<DES-N from step 2>"
+  blocks: ["<ENG-N from step 3>"]
 ```
 
 `blocks` is append-only (see `SKILL.md` → § MCP-tool guide → `save_issue` — update). Setting it once on the Design Issue creates the relation; Linear renders the inverse `blockedBy` on the Impl Issue automatically.
 
 ### 7. Echo result in chat
 
-- Project URL + `EVTDES-N` + `EVTENG-N`.
+- Project URL + `DES-N` + `ENG-N`.
 - Note that the Impl Issue stays blocked until the Design Issue reaches `Done` (when the designer's macro gets `Dev approved`).
 
 ## Notes

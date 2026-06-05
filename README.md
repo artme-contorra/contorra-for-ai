@@ -1,14 +1,14 @@
 # contorra-for-ai
 
-Claude Code plugin marketplace for AI-assisted work at Contorra. Currently ships the **Events tracker** suite: a shared base plus one plugin per role on the Events team, so each person's Claude works the Linear tracker (teams `EVTENG` Events Engineering + `EVTDES` Events Design) by the team's conventions — right scope, right guard-rails, right MCP-tool usage.
+Claude Code plugin marketplace for AI-assisted work at Contorra. Currently ships the **Events tracker** suite: a shared base plus one plugin per role on the Events team, so each person's Claude works the Linear tracker (teams `ENG` Events Engineering + `DES` Events Design) by the team's conventions — right scope, right guard-rails, right MCP-tool usage.
 
 ## Plugins
 
 | Plugin | Consumer | What it does |
 |---|---|---|
 | `events-tracker-shared` | (dependency) | Base map, ontology, invariants, and Linear MCP-tool guide. Bundles the Linear MCP server. Auto-loaded alongside any role plugin — not installed directly. |
-| `events-tracker-pm` | PM / tracker-owner | Create Project pairs (Design + Impl), sweep `EVTENG` Triage, plan cycles, status reviews. |
-| `events-tracker-designer` | Designer | Self-pull Design Issues in `EVTDES`, submit for dev review, respond to bounces, review impl on staging in `Design Review`. |
+| `events-tracker-pm` | PM / tracker-owner | Create Project pairs (Design + Impl), sweep `ENG` Triage, plan cycles, status reviews. |
+| `events-tracker-designer` | Designer | Self-pull Design Issues in `DES`, submit for dev review, respond to bounces, review impl on staging in `Design Review`. |
 | `events-tracker-dev` | Web devs | Pick up Impl Issues, walk `In Progress → In Review → In Staging`, hand off to Design Review / QA, respond to bounces, sign off on designs for implementability. |
 | `events-tracker-qa` | QA | Pick up Impl Issues in `QA` on staging, approve to `Done` (= release to prod) or reject with a checklist, route out-of-scope findings to Triage. |
 

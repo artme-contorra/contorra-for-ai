@@ -1,7 +1,7 @@
 {
   "name": "events-tracker-designer",
-  "version": "0.1.2",
-  "description": "Designer role for the Events tracker (Linear EVTDES + EVTENG). Self-pull Design Issues, submit for dev review, respond to bounces, review impl on staging in Design Review. Depends on events-tracker-shared for the base ontology.",
+  "version": "0.2.0",
+  "description": "Designer role for the Events tracker (Linear DES + ENG). Self-pull Design Issues, submit for dev review, respond to bounces, review impl on staging in Design Review. Depends on events-tracker-shared for the base ontology.",
   "author": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"

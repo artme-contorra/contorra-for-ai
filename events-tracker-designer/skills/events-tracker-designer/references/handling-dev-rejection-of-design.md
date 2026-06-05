@@ -1,14 +1,14 @@
 # Handling a dev rejection of a Design Issue
 
-Recipe for the designer's bounce-back: an own Design Issue was sent to `In Dev Review`, the dev rejected it on implementability and transitioned it to `In Progress` with a checklist comment + @-mention. Parse the checklist, address the items, return to `In Dev Review`. Loaded on demand from `events-tracker-designer` → `SKILL.md` → § References pointer. Entry-point trigger: "дев вернул дизайн", "макет отклонили, поправить", "address the dev's design rejection", "EVTDES-N bounced back".
+Recipe for the designer's bounce-back: an own Design Issue was sent to `In Dev Review`, the dev rejected it on implementability and transitioned it to `In Progress` with a checklist comment + @-mention. Parse the checklist, address the items, return to `In Dev Review`. Loaded on demand from `events-tracker-designer` → `SKILL.md` → § References pointer. Entry-point trigger: "дев вернул дизайн", "макет отклонили, поправить", "address the dev's design rejection", "DES-N bounced back".
 
-Out of scope: the original submission (see `submitting-design-for-dev-review.md`). The dev's review decision itself (dev skill). `EVTENG` review work (see `design-review-of-impl-issue.md`).
+Out of scope: the original submission (see `submitting-design-for-dev-review.md`). The dev's review decision itself (dev skill). `ENG` review work (see `design-review-of-impl-issue.md`).
 
 This mirrors the submission flow — same forward transition, after a fix pass. Confirm once before the re-submit batch.
 
 ## What happened
 
-The dev reviewed the macro on `EVTDES` `In Dev Review`, judged it not yet implementable, posted a checklist of required changes, transitioned the issue back to `In Progress`, and @-mentioned the designer (base § Statuses → `EVTDES`; ontology § 4.2). The issue is the designer's own — assignee unchanged (Invariant 1) — so the designer just picks it back up and works the list.
+The dev reviewed the macro on `DES` `In Dev Review`, judged it not yet implementable, posted a checklist of required changes, transitioned the issue back to `In Progress`, and @-mentioned the designer (base § Statuses → `DES`; ontology § 4.2). The issue is the designer's own — assignee unchanged (Invariant 1) — so the designer just picks it back up and works the list.
 
 ## Procedure
 
@@ -16,10 +16,10 @@ The dev reviewed the macro on `EVTDES` `In Dev Review`, judged it not yet implem
 
 ```
 mcp__linear-server__get_issue
-  id: "EVTDES-N"
+  id: "DES-N"
 
 mcp__linear-server__list_comments
-  issueId: "EVTDES-N"
+  issueId: "DES-N"
 ```
 
 Confirm: `state` is `In Progress`, `assignee` is the designer. Read the dev's most recent rejection comment — that's the checklist of what blocks implementability. Items are typically things like "this layout needs a fixed-width container the current grid can't express", "the animation timing isn't feasible with our component library", "missing the empty state for the list".
@@ -39,7 +39,7 @@ Once the checklist is addressed, return the issue to `In Dev Review` and @-menti
 ```
 # 1. Re-submit comment, @-mention the dev, speak to the checklist
 mcp__linear-server__save_comment
-  issueId: "EVTDES-N"
+  issueId: "DES-N"
   body: |
     @<dev displayName> addressed the review notes, ready for another look:
 
@@ -51,7 +51,7 @@ mcp__linear-server__save_comment
 
 # 2. Transition back to In Dev Review
 mcp__linear-server__save_issue
-  id: "EVTDES-N"
+  id: "DES-N"
   state: "In Dev Review"
 ```
 
@@ -59,7 +59,7 @@ Same shape as the original submission (`submitting-design-for-dev-review.md` ste
 
 ### 4. Echo result in chat
 
-- `EVTDES-N` → `In Dev Review`, dev @-mentioned, checklist items addressed.
+- `DES-N` → `In Dev Review`, dev @-mentioned, checklist items addressed.
 - Note the ball is back with the dev: approve (`→ Done`, sets `Dev approved`, releases any blocked Impl Issue) or another reject (back here again).
 
 ## Notes

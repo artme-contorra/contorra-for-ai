@@ -1,8 +1,8 @@
-# Sweeping `EVTENG` Triage
+# Sweeping `ENG` Triage
 
-Recipe for the daily PM flow: walk each `EVTENG` `Triage` entry, set the four missing facets (priority, type label, project, assignee), then transition out. Loaded on demand from `events-tracker-pm` → `SKILL.md` → § References pointer. Entry-point trigger: "разгрести triage", "что в triage у events", "sweep events triage".
+Recipe for the daily PM flow: walk each `ENG` `Triage` entry, set the four missing facets (priority, type label, project, assignee), then transition out. Loaded on demand from `events-tracker-pm` → `SKILL.md` → § References pointer. Entry-point trigger: "разгрести triage", "что в triage у events", "sweep events triage".
 
-Out of scope: `EVTDES` (no `Triage` on the Design team — see `SKILL.md` → § Ontology — condensed → Statuses). Issues already past `Triage`. Bulk-import or migration sweeps.
+Out of scope: `DES` (no `Triage` on the Design team — see `SKILL.md` → § Ontology — condensed → Statuses). Issues already past `Triage`. Bulk-import or migration sweeps.
 
 All steps run in chat. One confirmation per entry (a sweep over N entries = N confirmations, batched per entry).
 
@@ -18,7 +18,7 @@ mcp__linear-server__list_issues
   limit: 50
 ```
 
-Show count and a one-line summary per entry: `EVTENG-N — title — creator — createdAt — has-description?`. If the queue is empty, say so and stop.
+Show count and a one-line summary per entry: `ENG-N — title — creator — createdAt — has-description?`. If the queue is empty, say so and stop.
 
 If creator info is needed (to gauge context), fetch with `get_issue` on individual entries — `list_issues` returns the basics.
 
@@ -58,7 +58,7 @@ For Triage-incoming items the creator (often a teammate or support) usually didn
 
 #### 2e. Assignee
 
-- Pick one of the `EVTENG` devs — the one who owns this. Match the Project lead if attached to a Project; otherwise pick by area / workload (see `knowledge.md`).
+- Pick one of the `ENG` devs — the one who owns this. Match the Project lead if attached to a Project; otherwise pick by area / workload (see `knowledge.md`).
 - Resolve the assignee's Linear `displayName` from `knowledge.md` § Team or via `list_users name:"<dev name>"`. Pass as `displayName`, name, email, or UUID — **not** `assigneeId`.
 - If unclear which dev, ask in one turn: "which dev owns this?".
 
@@ -74,7 +74,7 @@ Tracker language is English (base Invariant 5). If the entry's title or descript
 
 For each entry, present the batch:
 
-- `EVTENG-N` — title.
+- `ENG-N` — title.
 - Decisions: priority, labels (`bug|feature|chore|tech-debt` + optional `UI`), project (or "standalone"), assignee.
 - Description addition if any.
 - Target state: `Backlog` (default) or `Todo` + `cycle: "<n>"` (only if explicitly pre-committed to the active cycle — usually for an urgent item the team agreed to pull in immediately).
@@ -83,7 +83,7 @@ Single confirmation per entry, then:
 
 ```
 mcp__linear-server__save_issue
-  id: "EVTENG-N"
+  id: "ENG-N"
   priority: 3
   labels: ["feature", "UI"]
   project: "<Project name>"           # omit if standalone
@@ -99,7 +99,7 @@ mcp__linear-server__save_issue
 
 ### 4. Move to the next entry
 
-Print `EVTENG-N` → new state in chat. Continue with the next Triage entry until the queue is empty or the user asks to pause.
+Print `ENG-N` → new state in chat. Continue with the next Triage entry until the queue is empty or the user asks to pause.
 
 ### 5. End-of-sweep summary
 
@@ -108,7 +108,7 @@ When the queue empties (or the user pauses), summarize: count swept, count promo
 ## Notes
 
 - **PM-created issues skip Triage.** This sweep is only for entries created by non-PM (team-members, support, automation). When the PM creates an issue directly, they already set priority + label + project + assignee at create time, so it lands in `Backlog` (or `Todo`). See `SKILL.md` → § Invariants → Triage routing.
-- **`EVTDES` has no Triage.** Ad-hoc design requests come via Slack and the PM creates the Issue directly in `EVTDES` `Backlog` — no equivalent sweep needed there.
+- **`DES` has no Triage.** Ad-hoc design requests come via Slack and the PM creates the Issue directly in `DES` `Backlog` — no equivalent sweep needed there.
 - **Cycle attachment is the exception.** Default end-state is `Backlog`, not `Todo` + cycle. Cycle planning (see `cycle-planning.md`) is when most Impl Issues move from `Backlog` to `Todo`. Use `Todo` + cycle in Triage sweep only for items the team explicitly agreed to pull in mid-cycle.
 - **One confirmation per entry, not per sweep.** Each entry's decisions are different — batching the whole queue into one approval loses the per-item review. The cost of N confirmations on a sweep is acceptable; the alternative is silently shipping a wrong assignee or label.
 - **Don't transition to `Done` / `Canceled` / `Duplicate` from Triage.** Those are post-work outcomes. If the Triage entry is genuinely a duplicate of an existing issue, use `state: "Duplicate"` + `duplicateOf: "<existing-N>"` — but treat this as a destructive transition (see `SKILL.md` → § Role scope and guard-rails → Confirmation rules: separate per-call confirmation).

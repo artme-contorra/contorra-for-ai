@@ -24,9 +24,9 @@ tools:
   - mcp__linear-server__create_issue_label
 description: >
   PM / tracker-owner role wrapper for the Events tracker in Linear (teams
-  `EVTENG` and `EVTDES`). Use whenever doing PM-side tracker work: creating a
-  Project pair (Design + Impl), sweeping `EVTENG` `Triage`, cycle planning,
-  status reviews, or any reference to an `EVTENG-N` / `EVTDES-N` identifier
+  `ENG` and `DES`). Use whenever doing PM-side tracker work: creating a
+  Project pair (Design + Impl), sweeping `ENG` `Triage`, cycle planning,
+  status reviews, or any reference to an `ENG-N` / `DES-N` identifier
   done from the PM seat. Triggers even when Linear isn't named explicitly.
   Pairs with the `events-tracker-base` skill (from the `events-tracker-shared`
   plugin, auto-installed as a dependency) for catalog + ontology + invariants
@@ -34,7 +34,7 @@ description: >
   comment) require explicit confirmation; status transitions to `Done` /
   `Canceled` / `Duplicate`, Project archive, cycle rewrites, and bulk
   description rewrites require per-call confirmation.
-  Trigger phrases: "events tracker", "EVTENG / EVTDES", "разгрести triage",
+  Trigger phrases: "events tracker", "ENG / DES", "разгрести triage",
   "запланируй цикл events", "создай проект events", "design + impl",
   "что у девов/дизайнера в трекере events".
 ---
@@ -47,8 +47,8 @@ PM / tracker-owner role for the Events tracker. This skill defines the PM-specif
 
 - Creates **Projects** (with both teams attached when the work spans design + impl).
 - Creates **Design Issue + Impl Issue pairs** inside Projects; sets `blocks` Design → Impl.
-- Sweeps **`EVTENG` Triage** (priority, type label, project, assignee, transition).
-- Plans **cycles** in `EVTENG` (pulls Impl Issues from `Backlog` to `Todo`, attaches to cycle).
+- Sweeps **`ENG` Triage** (priority, type label, project, assignee, transition).
+- Plans **cycles** in `ENG` (pulls Impl Issues from `Backlog` to `Todo`, attaches to cycle).
 - Status reviews, comments, ad-hoc edits where it serves the team.
 
 ### What the PM does NOT do
@@ -72,13 +72,13 @@ PM / tracker-owner role for the Events tracker. This skill defines the PM-specif
 Load on demand — combined base (this skill + `events-tracker-base`) covers the rest of the PM's needs.
 
 - `references/creating-project-pair.md` — load when creating a cross-team Project with a Design + Impl pair (the most choreographed PM flow).
-- `references/sweeping-triage.md` — load when working through `EVTENG` `Triage` entries: priority + label + project + assignee + transition.
-- `references/cycle-planning.md` — load at weekly cycle planning on `EVTENG`: pulling Impl Issues from `Backlog` into `Todo` for the active cycle.
+- `references/sweeping-triage.md` — load when working through `ENG` `Triage` entries: priority + label + project + assignee + transition.
+- `references/cycle-planning.md` — load at weekly cycle planning on `ENG`: pulling Impl Issues from `Backlog` into `Todo` for the active cycle.
 
 ## Workspace integration
 
 - `knowledge.md` — canon on team members (roles, working rhythm, traits, Linear `displayName`). Update there, not in this skill.
-- `state.md` — current PM focus; may reference specific `EVTENG-N` / `EVTDES-N` items. After a sync, surface entries that need a status nudge.
+- `state.md` — current PM focus; may reference specific `ENG-N` / `DES-N` items. After a sync, surface entries that need a status nudge.
 - `linear-context` — **deprecated** for Events work; still owns Artem's personal `CON` tracker until that's migrated. Don't widen this skill to cover `CON`.
 - `jira-context` — out of scope. Jira `EV` is being superseded by this Linear setup; for legacy `EV-N` references use the `jira-context` skill.
 - `slack-context` — orthogonal. `@-mention` syntax in Linear uses `displayName`; Slack handles + UserIDs are different identifiers in `slack-context`.

@@ -1,7 +1,7 @@
 {
   "name": "events-tracker-qa",
-  "version": "0.1.1",
-  "description": "QA role for the Events tracker (Linear EVTENG). Pick up Impl Issues in QA status, test on staging, then approve (set QA approved + transition to Done = released to prod) or reject (checklist comment + back to In Progress + @-mention the dev). Depends on events-tracker-shared for the base ontology.",
+  "version": "0.2.0",
+  "description": "QA role for the Events tracker (Linear ENG). Pick up Impl Issues in QA status, test on staging, then approve (set QA approved + transition to Done = released to prod) or reject (checklist comment + back to In Progress + @-mention the dev). Depends on events-tracker-shared for the base ontology.",
   "author": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"

@@ -1,7 +1,7 @@
 {
   "name": "events-tracker-dev",
-  "version": "0.1.1",
-  "description": "Developer role for the Events tracker (Linear EVTENG + EVTDES). Pick up Impl Issues, walk In Progress → In Review → In Staging, hand off to Design Review / QA, respond to bounces, and sign off on design implementability in EVTDES In Dev Review. Depends on events-tracker-shared for the base ontology.",
+  "version": "0.2.0",
+  "description": "Developer role for the Events tracker (Linear ENG + DES). Pick up Impl Issues, walk In Progress → In Review → In Staging, hand off to Design Review / QA, respond to bounces, and sign off on design implementability in DES In Dev Review. Depends on events-tracker-shared for the base ontology.",
   "author": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"

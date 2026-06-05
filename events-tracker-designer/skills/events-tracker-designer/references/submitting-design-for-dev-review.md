@@ -1,14 +1,14 @@
 # Submitting a Design Issue for dev review
 
-Recipe for the designer's hand-off: an own Design Issue in `EVTDES` `In Progress` is ready, transition it to `In Dev Review` and @-mention the responsible dev (the Project lead) so they sign off on implementability. Loaded on demand from `events-tracker-designer` → `SKILL.md` → § References pointer. Entry-point trigger: "отправь дизайн на ревью девам", "макет готов, на ревью", "submit design for dev review", "EVTDES-N ready for dev".
+Recipe for the designer's hand-off: an own Design Issue in `DES` `In Progress` is ready, transition it to `In Dev Review` and @-mention the responsible dev (the Project lead) so they sign off on implementability. Loaded on demand from `events-tracker-designer` → `SKILL.md` → § References pointer. Entry-point trigger: "отправь дизайн на ревью девам", "макет готов, на ревью", "submit design for dev review", "DES-N ready for dev".
 
-Out of scope: the dev's review decision (`In Dev Review` → `Done` / → `In Progress` — that's the dev's call, lives in the dev skill). Handling a rejection that comes back (see `handling-dev-rejection-of-design.md`). `EVTENG` review work (see `design-review-of-impl-issue.md`).
+Out of scope: the dev's review decision (`In Dev Review` → `Done` / → `In Progress` — that's the dev's call, lives in the dev skill). Handling a rejection that comes back (see `handling-dev-rejection-of-design.md`). `ENG` review work (see `design-review-of-impl-issue.md`).
 
 All steps run in chat. The transition + @-mention comment is one logical hand-off; confirm once before writing.
 
 ## Why `In Dev Review` exists
 
-`EVTDES` runs a single review gate: the dev signs off that the macro is **implementable** before the designer's work is considered complete (base § Statuses → `EVTDES`). The dev — not the designer — flips the issue to `Done` and sets `Dev approved`. This step is the designer signaling "macro ready, your turn to check".
+`DES` runs a single review gate: the dev signs off that the macro is **implementable** before the designer's work is considered complete (base § Statuses → `DES`). The dev — not the designer — flips the issue to `Done` and sets `Dev approved`. This step is the designer signaling "macro ready, your turn to check".
 
 ## Procedure
 
@@ -16,7 +16,7 @@ All steps run in chat. The transition + @-mention comment is one logical hand-of
 
 ```
 mcp__linear-server__get_issue
-  id: "EVTDES-N"
+  id: "DES-N"
 ```
 
 Check: `state` is `In Progress`, `assignee` is the designer. If it's still `Todo`, the designer hasn't formally started — that's fine, but the forward path is `Todo` → `In Progress` → `In Dev Review`; don't jump straight from `Todo`. If the assignee isn't the designer, stop and flag — this isn't the designer's issue to move (Invariant 1).
@@ -47,7 +47,7 @@ Show the draft in chat: target state, the dev being @-mentioned, the comment bod
 ```
 # 1. Post the hand-off comment (@-mention the dev)
 mcp__linear-server__save_comment
-  issueId: "EVTDES-N"
+  issueId: "DES-N"
   body: |
     @<dev displayName> macro ready for implementability review.
 
@@ -57,7 +57,7 @@ mcp__linear-server__save_comment
 
 # 2. Transition to In Dev Review
 mcp__linear-server__save_issue
-  id: "EVTDES-N"
+  id: "DES-N"
   state: "In Dev Review"
 ```
 
@@ -67,12 +67,12 @@ Comment-before-transition or transition-before-comment both work; keep them in t
 
 ### 5. Echo result in chat
 
-- `EVTDES-N` → `In Dev Review`, dev @-mentioned.
+- `DES-N` → `In Dev Review`, dev @-mentioned.
 - Note: the dev now owns the next move — approve (`→ Done`, sets `Dev approved`, releases any blocked Impl Issue) or reject (`→ In Progress` with a checklist, bounced back to the designer — handled in `handling-dev-rejection-of-design.md`).
 
 ## Notes
 
-- **Designer never sets `Dev approved` or transitions to `Done`.** Both are the dev's actions on this issue (base § Labels → `EVTDES`; ontology § 4.2). The designer's job ends at `In Dev Review`; the next forward step is the dev's.
+- **Designer never sets `Dev approved` or transitions to `Done`.** Both are the dev's actions on this issue (base § Labels → `DES`; ontology § 4.2). The designer's job ends at `In Dev Review`; the next forward step is the dev's.
 - **Assignee unchanged.** The dev is the reviewer, not the new owner — the @-mention + status change is the "you need to look" signal, no reassignment (Invariant 1, rationale in ontology § 4.3).
-- **No labels on this transition.** `EVTDES` has only `Dev approved`, set by the dev later. The designer adds nothing.
+- **No labels on this transition.** `DES` has only `Dev approved`, set by the dev later. The designer adds nothing.
 - **If the dev approves**, the Design Issue reaches `Done` and — if it `blocks` an Impl Issue — releases that dependency (base § Blocking relations). The designer doesn't need to act further unless a new Design Issue is queued.

@@ -1,14 +1,14 @@
 # QA pickup — test an Impl Issue on staging
 
-Recipe for QA's entry flow: an Impl Issue sits in `EVTENG` `QA` (the dev or designer @-mentioned QA after staging), read the issue + comments for context, then plan and run the test pass on the staging build. Loaded on demand from `events-tracker-qa` → `SKILL.md` → § References pointer. Entry-point trigger: "что мне на QA", "прогони EVTENG-N на стейджинге", "what's waiting for QA", "test this on staging".
+Recipe for QA's entry flow: an Impl Issue sits in `ENG` `QA` (the dev or designer @-mentioned QA after staging), read the issue + comments for context, then plan and run the test pass on the staging build. Loaded on demand from `events-tracker-qa` → `SKILL.md` → § References pointer. Entry-point trigger: "что мне на QA", "прогони ENG-N на стейджинге", "what's waiting for QA", "test this on staging".
 
-Out of scope: the verdict itself — approve / reject / findings routing live in `qa-review-of-impl.md`. Issues in any status other than `QA` — QA only touches an Impl Issue on this review call (`SKILL.md` → § Role scope → What QA does NOT do). `EVTDES` Design Issues — not QA's board.
+Out of scope: the verdict itself — approve / reject / findings routing live in `qa-review-of-impl.md`. Issues in any status other than `QA` — QA only touches an Impl Issue on this review call (`SKILL.md` → § Role scope → What QA does NOT do). `DES` Design Issues — not QA's board.
 
 This step is all reads — no confirmation needed. The writes come at the verdict.
 
 ## Posture — why QA is the release gate
 
-QA validates on staging **before** promotion to prod. There is no middle "ready to promote" status: `QA` → `Done` *is* the promotion, and `Done` means released (base § Statuses → `EVTENG`; ontology § 4.1). So QA's approve is the release gate — the sign-off that flips the build from staging to prod (delivery-flow § 2: "her sign-off is what flips a build from staging to prod ... without it, the build doesn't promote").
+QA validates on staging **before** promotion to prod. There is no middle "ready to promote" status: `QA` → `Done` *is* the promotion, and `Done` means released (base § Statuses → `ENG`; ontology § 4.1). So QA's approve is the release gate — the sign-off that flips the build from staging to prod (delivery-flow § 2: "her sign-off is what flips a build from staging to prod ... without it, the build doesn't promote").
 
 This is the transitional posture — delivery-flow § 7 step 0: QA is a **per-task phase**, sequential, running after design review on UI issues. In later steps it shifts to async sampling of staging batches, but that's substrate-gated and not where the team is today. Today: every `QA` issue is a task to test and gate, one at a time.
 
@@ -25,11 +25,11 @@ mcp__linear-server__list_issues
   limit: 50
 ```
 
-Show count + one line per entry: `EVTENG-N — title — assignee (dev) — Type label — UI?`. Or if the user named a specific `EVTENG-N`, `get_issue` it directly. If the queue is empty, say so and stop.
+Show count + one line per entry: `ENG-N — title — assignee (dev) — Type label — UI?`. Or if the user named a specific `ENG-N`, `get_issue` it directly. If the queue is empty, say so and stop.
 
 ### 2. Read the issue for context
 
-`get_issue EVTENG-N` and `list_comments issueId:"EVTENG-N"`. From these, pin down:
+`get_issue ENG-N` and `list_comments issueId:"ENG-N"`. From these, pin down:
 
 - **Staging link** — from the dev's (or designer's) hand-off @-mention comment. If absent, ask in a comment / Slack — **don't test blind.**
 - **What changed** — the issue title + description (minimal for in-Project issues; context lives in the Project) and the hand-off comment. For an in-Project issue, the Project description carries the fuller "what / why".
