@@ -23,8 +23,7 @@ description: >
   (PM, dev, designer, QA) — pair this skill with a role plugin for full
   coverage. Use whenever any Events tracker work comes up in this workspace,
   even when Linear isn't named explicitly. Strictly scoped to the two Events
-  teams; `Artem Personal` and any other Linear teams are out of scope (use
-  `linear-context` for `CON` until migrated).
+  teams; `Artem Personal` and any other Linear teams are out of scope.
   Trigger phrases: "events tracker", "ENG / DES", "ENG-N", "DES-N",
   "трекер events", "Stability / AI Platform / UX initiative", "Events Project",
   "что в трекере events".
@@ -43,9 +42,9 @@ Base for the Events tracker. Not a workflow — a space map: catalog + ontology 
 | Designer | 1 | Linear assignee for Design Issues in `DES`. |
 | QA | 1 | Reviewer on `ENG` `QA` status; not assigned (assignee = dev — see § Invariants). |
 
-People canon (current roster, names, working rhythm): `knowledge.md` → § Team in the management workspace. Slack handles + UserIDs: `slack-context` skill.
+People canon (current roster, names, working rhythm) is intentionally not stored here — it drifts, and this plugin ships into different workspaces. Resolve people at execution time via `list_users` (below). If the host workspace keeps its own team-roster / context doc or a Slack-context skill, prefer it for names and handles when it's fresh.
 
-Linear `displayName` for each person is intentionally not hardcoded here — it drifts when the roster or handles change. At execution time resolve from `knowledge.md` or via `list_users name:"<person name>"` (most current). Mobile team is out of scope.
+Linear `displayName` for each person is intentionally not hardcoded here — it drifts when the roster or handles change. At execution time resolve via `list_users name:"<person name>"` (most current); fall back to a host-workspace roster doc only when it's fresher. Mobile team is out of scope.
 
 ### Linear teams
 
@@ -76,7 +75,7 @@ Snapshot as of 2026-06-04; refresh via `list_projects team:"Events Engineering"`
 
 ## Ontology — condensed
 
-Canonical source (in the management workspace): `research/processes/2026-06-04_events-tracker-ontology-design.md`. This section is the operating summary; canonical wins on conflict.
+This section is the self-contained operating canon for the ontology — no external file is required for it to hold. (It was distilled from a fuller design doc in the originating workspace; that doc is not a dependency.)
 
 ### Entity gradient (Initiative → Project → Issue → Sub-issue)
 
@@ -243,9 +242,6 @@ There is **no `delete_initiative`** MCP tool. Initiative deletion is UI-only in 
 
 Per the linear-server MCP server instruction: pass content with **literal newlines and special characters**, not escape sequences (e.g. write real newlines in a markdown body, not `\n`). Applies to `description` and `body`.
 
-## Canonical-source pointer
+## Provenance
 
-- Ontology canon (management workspace): `research/processes/2026-06-04_events-tracker-ontology-design.md`.
-- Delivery-flow canon (substrate, discipline, why the tracker shape is what it is): `research/processes/2026-06-03_events-delivery-flow-design.md`.
-
-If this skill conflicts with the canonical docs, **canonical wins** — patch the skill, not the doc. Flag the discrepancy in chat when surfaced.
+This skill is self-contained: the catalog, ontology, and invariants above are the operating canon, with no external file dependency — it behaves the same in any workspace where it's installed. It was originally distilled from design docs in the tracker-owner's workspace (an events-tracker ontology design and an events delivery-flow design). If the host workspace still carries those and they conflict with this skill, treat the fuller doc as authoritative and patch the skill; otherwise this skill is the reference. Flag any discrepancy in chat when surfaced.

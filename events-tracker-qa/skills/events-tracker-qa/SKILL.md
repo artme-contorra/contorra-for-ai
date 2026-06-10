@@ -54,7 +54,7 @@ QA's entire surface is one board, one status: `ENG` issues in `QA`. There are no
 - **Doesn't reassign.** Assignee = the dev who delivers, all the way to `Done` (Invariant 1 in `events-tracker-base`). On a reject, QA communicates via comment + @-mention + status change — never by reassigning. The issue is never assigned to QA.
 - **Doesn't create Projects or Initiatives.** Entity-level structure is the PM's job.
 - **Doesn't skip Triage on create.** Any `ENG` issue QA creates (an out-of-scope finding, or in the rare extreme case a sub-issue) lands in `Triage` — only the PM skips it (base Invariant 2).
-- **Doesn't write to `DES` or any other Linear team.** Scope is `ENG` `QA`. Design Issues, the personal `CON` tracker, and everything else are out of scope.
+- **Doesn't write to `DES` or any other Linear team.** Scope is `ENG` `QA`. Design Issues, any personal tracker, and everything else are out of scope.
 
 ### Confirmation rules
 

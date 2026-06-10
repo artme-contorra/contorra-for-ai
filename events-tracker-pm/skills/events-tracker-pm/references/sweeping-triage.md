@@ -58,8 +58,8 @@ For Triage-incoming items the creator (often a teammate or support) usually didn
 
 #### 2e. Assignee
 
-- Pick one of the `ENG` devs — the one who owns this. Match the Project lead if attached to a Project; otherwise pick by area / workload (see `knowledge.md`).
-- Resolve the assignee's Linear `displayName` from `knowledge.md` § Team or via `list_users name:"<dev name>"`. Pass as `displayName`, name, email, or UUID — **not** `assigneeId`.
+- Pick one of the `ENG` devs — the one who owns this. Match the Project lead if attached to a Project; otherwise pick by area / workload (use the host-workspace roster if it has one, else ask).
+- Resolve the assignee's Linear `displayName` via `list_users name:"<dev name>"` (or a host-workspace roster doc if fresher). Pass as `displayName`, name, email, or UUID — **not** `assigneeId`.
 - If unclear which dev, ask in one turn: "which dev owns this?".
 
 #### 2f. Description sanity check

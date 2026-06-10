@@ -23,7 +23,7 @@ If any of these are unclear, ask in one turn (batch the missing fields). Do not 
 
 ### 2. Resolve Linear `displayName` for dev + designer
 
-Resolve the responsible dev's Linear `displayName` — either from `knowledge.md` § Team (if recent), or via `list_users name:"<dev name>"` (most current). Save it for use in `lead` on the Project and `assignee` on the Impl Issue.
+Resolve the responsible dev's Linear `displayName` via `list_users name:"<dev name>"` (most current), or from a host-workspace roster doc if it's fresher. Save it for use in `lead` on the Project and `assignee` on the Impl Issue.
 
 Resolve the designer's `displayName` the same way for use in `assignee` on the Design Issue.
 

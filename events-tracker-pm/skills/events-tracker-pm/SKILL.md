@@ -75,11 +75,12 @@ Load on demand — combined base (this skill + `events-tracker-base`) covers the
 - `references/sweeping-triage.md` — load when working through `ENG` `Triage` entries: priority + label + project + assignee + transition.
 - `references/cycle-planning.md` — load at weekly cycle planning on `ENG`: pulling Impl Issues from `Backlog` into `Todo` for the active cycle.
 
-## Workspace integration
+## Host-workspace integration
 
-- `knowledge.md` — canon on team members (roles, working rhythm, traits, Linear `displayName`). Update there, not in this skill.
-- `state.md` — current PM focus; may reference specific `ENG-N` / `DES-N` items. After a sync, surface entries that need a status nudge.
-- `linear-context` — **deprecated** for Events work; still owns Artem's personal `CON` tracker until that's migrated. Don't widen this skill to cover `CON`.
-- `jira-context` — out of scope. Jira `EV` is being superseded by this Linear setup; for legacy `EV-N` references use the `jira-context` skill.
-- `slack-context` — orthogonal. `@-mention` syntax in Linear uses `displayName`; Slack handles + UserIDs are different identifiers in `slack-context`.
-- `github-context` — orthogonal. Branch / PR conventions described there; tracker side described here.
+This plugin is self-contained and ships into different workspaces; it does not require any particular host file to exist. Where a host workspace provides context, use it — but don't depend on it:
+
+- **People / role canon** (roles, working rhythm, Linear `displayName`) may live in a host-workspace doc or roster. Prefer it when fresh; otherwise resolve names via `list_users` (the portable path). This skill stores no roster.
+- **Current PM focus** may live in a host-workspace state / operating doc that references specific `ENG-N` / `DES-N` items. After a sync, surface entries that need a status nudge — but the tracker itself is the source of truth for status.
+- **Personal / other Linear teams are out of scope.** Don't widen this skill to a personal tracker or any team other than `ENG` / `DES`. If the host workspace has a personal-tracker skill, that's a separate surface.
+- **Legacy Jira (`EV`)** — if the team is mid-migration, `EV-N` items are read through the host workspace's Jira-context skill, if it has one. Orthogonal; cross-reference only.
+- **Slack / GitHub** — orthogonal. Linear `@-mentions` use `displayName`; Slack handles + GitHub identities are different and live in their own host-workspace context skills, if present.
