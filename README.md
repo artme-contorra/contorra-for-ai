@@ -11,8 +11,11 @@ Claude Code plugin marketplace for AI-assisted work at Contorra. Currently ships
 | `events-tracker-designer` | Designer | Self-pull Design Issues in `DES`, submit for dev review, respond to bounces, review impl on staging in `Design Review`. |
 | `events-tracker-dev` | Web devs | Pick up Impl Issues, walk `In Progress → In Review → In Staging`, hand off to Design Review / QA, respond to bounces, sign off on designs for implementability. |
 | `events-tracker-qa` | QA | Pick up Impl Issues in `QA` on staging, approve to `Done` (= release to prod) or reject with a checklist, route out-of-scope findings to Triage. |
+| `events-tracker-public` | Leadership / stakeholders (outside dev) | Read ENG + DES read-only (issue status, what's in flight, find by topic, project & initiative summaries); file requests into ENG Triage. Standalone — does not use `events-tracker-shared`. |
 
 Each role plugin depends on `events-tracker-shared`; installing a role pulls the base automatically. Install exactly one role plugin — it pairs with the base to read as one combined context.
+
+`events-tracker-public` is the exception: it is for people **outside** the dev team (leadership, product owners) and is fully standalone — it bundles its own Linear MCP, does **not** depend on `events-tracker-shared`, and exposes none of the team's internal workflow (read-only across both teams, plus filing into ENG Triage). Install it on its own.
 
 ## Install
 
