@@ -26,9 +26,11 @@ list_issues team:"Events Engineering" state:"started"
 list_issues team:"Events Design" state:"started"
 ```
 
-`state:"started"` covers everything in the **In progress** bucket. Summarize by
-project where possible. For a narrative of recent movement, add project status
-updates (recipe 4) for the active projects.
+Here `state:"started"` is a Linear status-*type* filter that returns whatever is
+actively being worked — i.e. the **In progress** bucket. Summarize by project
+where possible, and report it as "in progress" rather than by internal status
+name. For a narrative of recent movement, add project status updates (recipe 4)
+for the active projects.
 
 ## 3. Find an issue by topic
 
