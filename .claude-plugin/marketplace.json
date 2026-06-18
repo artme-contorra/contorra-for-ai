@@ -30,6 +30,11 @@
       "name": "events-tracker-qa",
       "source": "./events-tracker-qa",
       "description": "QA role for the Events tracker — pick up Impl Issues in QA on staging, approve to Done (release gate) or reject with checklist, file sub-issue bugs."
+    },
+    {
+      "name": "events-tracker-public",
+      "source": "./events-tracker-public",
+      "description": "Stakeholder-facing Events tracker access for people outside the dev team — read ENG + DES read-only, file requests into ENG Triage. Standalone; does not use events-tracker-shared."
     }
   ]
 }
