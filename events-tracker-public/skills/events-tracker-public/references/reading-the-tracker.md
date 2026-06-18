@@ -1,0 +1,64 @@
+# Reading the Events tracker
+
+Read-only recipes over `ENG` (Events Engineering) and `DES` (Events Design).
+Always pass `team:` so queries don't pull workspace-wide. Report status in the
+four buckets from SKILL.md (Not started / In progress / Done / Won't ship) — not
+the team's internal status names — unless the person asks for detail.
+
+## 1. Status of a specific issue
+
+Given an identifier like `ENG-42` or `DES-7`:
+
+```
+get_issue id:"ENG-42"
+```
+
+Report: the title, which bucket it's in, who it's assigned to, and the most
+recent update (pull recent comments with `list_comments issueId:"ENG-42"` if a
+fuller picture helps).
+
+## 2. What's happening in Events right now
+
+Active work across both teams:
+
+```
+list_issues team:"Events Engineering" state:"started"
+list_issues team:"Events Design" state:"started"
+```
+
+`state:"started"` covers everything in the **In progress** bucket. Summarize by
+project where possible. For a narrative of recent movement, add project status
+updates (recipe 4) for the active projects.
+
+## 3. Find an issue by topic
+
+```
+list_issues team:"Events Engineering" query:"<topic words>"
+list_issues team:"Events Design" query:"<topic words>"
+```
+
+`query` searches title + description. Widen or narrow the words if the first
+pass misses.
+
+## 4. Summarize a project
+
+```
+list_projects team:"Events Engineering"        # find the project by name
+get_project id:"<project id or name>"
+list_issues project:"<project name>"           # its issues, group by bucket
+get_status_updates projectId:"<project id>"     # latest narrative updates
+```
+
+Give: what the project delivers (its description), how its issues split across
+the four buckets, the lead, and the latest status update.
+
+## 5. Exec overview (initiatives → projects)
+
+```
+list_initiatives                                # strategic banners
+list_projects team:"Events Engineering"
+list_projects team:"Events Design"
+```
+
+Roll up: each initiative, the projects under it, each project's coarse status
+and lead. This is the "state of the product" view.
