@@ -1,13 +1,14 @@
 # Reading the Events tracker
 
-Read-only recipes over `ENG` (Events Engineering) and `DES` (Events Design).
-Always pass `team:` so queries don't pull workspace-wide. Report status in the
-four buckets from SKILL.md (Not started / In progress / Done / Won't ship) — not
-the team's internal status names — unless the person asks for detail.
+Read-only recipes over `ENG` (Events Engineering), `DES` (Events Design) and
+`REQ` (Feature requests, where parked requests live). Always pass `team:` so
+queries don't pull workspace-wide. Report status in the buckets from SKILL.md
+(Not started / In progress / Done / Won't ship, plus Parked on `REQ`) — not the
+team's internal status names — unless the person asks for detail.
 
 ## 1. Status of a specific issue
 
-Given an identifier like `ENG-42` or `DES-7`:
+Given an identifier like `ENG-42`, `DES-7` or `REQ-3`:
 
 ```
 get_issue id:"ENG-42"
@@ -37,10 +38,13 @@ for the active projects.
 ```
 list_issues team:"Events Engineering" query:"<topic words>"
 list_issues team:"Events Design" query:"<topic words>"
+list_issues team:"Feature requests" query:"<topic words>"
 ```
 
 `query` searches title + description. Widen or narrow the words if the first
-pass misses.
+pass misses. A request the team is not working on is found in `REQ`, not `ENG`;
+report it as parked and quote the revisit condition from its comments
+(`list_comments issueId:"REQ-N"`).
 
 ## 4. Summarize a project
 

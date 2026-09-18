@@ -25,8 +25,10 @@ description: >
   this is the primary, most-frequent use. (2) READ the tracker, read-only,
   across the whole Events product (`ENG` + `DES`): status of an issue, what's
   happening now, find an issue by topic, summarize a project, exec overview of
-  initiatives and projects. Self-contained — exposes none of the team's
-  internal workflow. Strictly scoped to the two Events teams; `Artem Personal`
+  initiatives and projects, including `REQ` Feature requests, where the team
+  parks requests it is deliberately not working on, each with a revisit
+  condition. Self-contained — exposes none of the team's internal workflow.
+  Strictly scoped to the Events teams (`ENG`, `DES`, `REQ`); `Artem Personal`
   and any other Linear team are out of scope. Use whenever someone outside the
   dev team wants to check on Events work or submit a request / feature idea /
   feedback, even when Linear isn't named explicitly. Trigger phrases:
@@ -46,8 +48,11 @@ dev / designer / QA) run separate plugins; this one never does their work.
 
 A minimal map — just enough to read and to file. Nothing more is needed here.
 
-- **Teams:** `ENG` (Events Engineering) and `DES` (Events Design). Both are
-  readable. New requests are filed only into `ENG`.
+- **Teams:** `ENG` (Events Engineering), `DES` (Events Design), and `REQ`
+  (Feature requests). All three are readable. New requests are filed only into
+  `ENG`. `REQ` is where the team parks requests it is deliberately not working
+  on; each record carries the condition under which it is revisited, and a
+  repeat of the same request is linked to it rather than filed again.
 - **Entity grid:**
   - **Initiative** — a strategic banner several projects sit under.
   - **Project** — a concrete deliverable; may span both teams (design + build).
@@ -55,9 +60,12 @@ A minimal map — just enough to read and to file. Nothing more is needed here.
 - **Status, in four buckets** (the team uses finer-grained statuses internally;
   for reading, collapse them):
   - **Not started** — `Triage`, `Backlog`, `Todo`.
-  - **In progress** — anything actively being worked or reviewed.
-  - **Done** — shipped.
-  - **Won't ship** — `Canceled`, `Duplicate`.
+  - **In progress** — anything actively being worked or reviewed; on `REQ`,
+    `Promoted` (work has been opened for it).
+  - **Done** — shipped; on `REQ`, `Delivered`.
+  - **Won't ship** — `Canceled`, `Duplicate`; on `REQ`, `Declined`.
+  - **Parked** (`REQ` only) — `Parked`, `Up for review`: not being worked on,
+    revisited under the condition written on the record.
 - **Triage** — the inbox on `ENG` where new requests land. The team triages from
   there. Filing a request (below) means landing a clean issue in `Triage`.
 
@@ -107,16 +115,20 @@ above — don't expose the team's internal status names unless asked. For the
 recipes (status of an issue, what's happening now, find by topic, project
 summary, exec overview), load `references/reading-the-tracker.md`.
 
-Always scope list/get calls by team (`team: "Events Engineering"` or
-`team: "Events Design"`) so queries don't pull workspace-wide.
+Always scope list/get calls by team (`team: "Events Engineering"`,
+`team: "Events Design"` or `team: "Feature requests"`) so queries don't pull
+workspace-wide. When someone asks what happened to a request they made, check
+`REQ` as well as `ENG`: a parked request lives there, with its revisit condition
+in the comments.
 
 ## Scope and guard-rails
 
 - **Read freely.** All `list_*` / `get_*` calls are unrestricted.
 - **One write only:** creating an issue in `ENG` `Triage`, after showing the
-  draft and getting confirmation. No other writes exist for this skill.
-- **Scope is `ENG` + `DES` only.** `Artem Personal` and every other Linear team
-  are out of scope.
+  draft and getting confirmation. No other writes exist for this skill. Never
+  create anything in `REQ`: the team moves things there itself.
+- **Scope is `ENG` + `DES` + `REQ` only.** `Artem Personal` and every other
+  Linear team are out of scope.
 - **No internal process.** This skill carries no team workflow, invariants, or
   label/cycle mechanics — and shouldn't grow them. If a request needs that
   depth, it belongs to a role plugin, not here.

@@ -1,7 +1,7 @@
 {
   "name": "events-tracker-public",
-  "version": "0.1.0",
-  "description": "Read-only Events tracker access (Linear ENG + DES) plus filing requests into ENG Triage, for stakeholders outside the dev team. Self-contained; bundles the Linear MCP server; no internal team process.",
+  "version": "0.1.1",
+  "description": "Read-only Events tracker access (Linear ENG + DES + REQ) plus filing requests into ENG Triage, for stakeholders outside the dev team. Self-contained; bundles the Linear MCP server; no internal team process.",
   "author": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"

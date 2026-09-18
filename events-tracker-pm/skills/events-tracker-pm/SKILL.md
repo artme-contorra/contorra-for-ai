@@ -48,6 +48,7 @@ PM / tracker-owner role for the Events tracker. This skill defines the PM-specif
 - Creates **Projects** (with both teams attached when the work spans design + impl).
 - Creates **Design Issue + Impl Issue pairs** inside Projects; sets `blocks` Design → Impl.
 - Sweeps **`ENG` Triage** (priority, type label, project, assignee, transition).
+- **Parks** what the team deliberately does not take: moves the issue to `REQ` (`Feature requests`) as `Parked` with a one-line return condition. `REQ` is the PM's to write; every other role reads it only.
 - Plans **cycles** in `ENG` (pulls Impl Issues from `Backlog` to `Todo`, attaches to cycle).
 - Status reviews, comments, ad-hoc edits where it serves the team.
 
@@ -62,7 +63,8 @@ PM / tracker-owner role for the Events tracker. This skill defines the PM-specif
 - Reads — unrestricted, use freely.
 - Writes (`save_issue`, `save_project`, `save_comment`, `save_initiative`, `save_status_update`, `create_issue_label`) — single confirmation per operation. No speculative pre-population.
 - Per-call confirmation, even within a session that already approved another write:
-  - Transitions to `Done` / `Canceled` / `Duplicate`.
+  - Transitions to `Done` / `Canceled` / `Duplicate`, and `Declined` on `REQ`.
+  - Moving an issue out of `ENG` into `REQ` (it leaves the team's board).
   - Project archive (via `save_project` `state`).
   - Cycle rewrites (re-attaching multiple issues across cycles).
   - Bulk description rewrites.
@@ -81,6 +83,7 @@ This plugin is self-contained and ships into different workspaces; it does not r
 
 - **People / role canon** (roles, working rhythm, Linear `displayName`) may live in a host-workspace doc or roster. Prefer it when fresh; otherwise resolve names via `list_users` (the portable path). This skill stores no roster.
 - **Current PM focus** may live in a host-workspace state / operating doc that references specific `ENG-N` / `DES-N` items. After a sync, surface entries that need a status nudge — but the tracker itself is the source of truth for status.
-- **Personal / other Linear teams are out of scope.** Don't widen this skill to a personal tracker or any team other than `ENG` / `DES`. If the host workspace has a personal-tracker skill, that's a separate surface.
+- **Personal / other Linear teams are out of scope.** Don't widen this skill to a personal tracker or any team other than `ENG` / `DES` / `REQ`. If the host workspace has a personal-tracker skill, that's a separate surface.
+- **Parking rules** (what qualifies as parked, the return condition, the review cadence) may live in a host-workspace skill (e.g. a triage-sweep skill with its own routing grid). When present, it decides; this plugin only carries the mechanics.
 - **Legacy Jira (`EV`)** — if the team is mid-migration, `EV-N` items are read through the host workspace's Jira-context skill, if it has one. Orthogonal; cross-reference only.
 - **Slack / GitHub** — orthogonal. Linear `@-mentions` use `displayName`; Slack handles + GitHub identities are different and live in their own host-workspace context skills, if present.

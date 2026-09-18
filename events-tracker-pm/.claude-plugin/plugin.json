@@ -1,7 +1,7 @@
 {
   "name": "events-tracker-pm",
-  "version": "0.4.1",
-  "description": "PM / tracker-owner role for the Events tracker (Linear ENG + DES). Project pair creation, Triage sweep, cycle planning. Depends on events-tracker-shared for the base ontology.",
+  "version": "0.4.2",
+  "description": "PM / tracker-owner role for the Events tracker (Linear ENG + DES, parking into REQ). Project pair creation, Triage sweep and parking, cycle planning. Depends on events-tracker-shared for the base ontology.",
   "author": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"

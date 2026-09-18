@@ -22,9 +22,11 @@ description: >
   Contorra. Auto-loaded as a dependency of any `events-tracker-*` role plugin
   (PM, dev, designer, QA) — pair this skill with a role plugin for full
   coverage. Use whenever any Events tracker work comes up in this workspace,
-  even when Linear isn't named explicitly. Strictly scoped to the two Events
-  teams; `Artem Personal` and any other Linear teams are out of scope.
-  Trigger phrases: "events tracker", "ENG / DES", "ENG-N", "DES-N",
+  even when Linear isn't named explicitly. Strictly scoped to the Events
+  teams: `ENG`, `DES`, and `REQ` Feature requests (the ledger of parked
+  requests, not a work team); `Artem Personal` and any other Linear teams are
+  out of scope.
+  Trigger phrases: "events tracker", "ENG / DES", "ENG-N", "DES-N", "REQ-N",
   "трекер events", "Events initiative", "Events Project",
   "что в трекере events".
 ---
@@ -52,8 +54,11 @@ Linear `displayName` for each person is intentionally not hardcoded here — it 
 |---|---|---|---|
 | `ENG` | Events Engineering | `23ad419d-cc6f-423d-a7f7-18cccb2833cc` | Impl Issues (web). Weekly cycles. |
 | `DES` | Events Design | `3088ba1c-456d-4357-af55-ec4b288480bc` | Design Issues. No cycles. |
+| `REQ` | Feature requests | `1d8c5f22-3b0e-4585-b432-97838ea3376a` | Ledger of parked requests. Not work: no cycles, no projects, Triage off. |
 
-Issue identifiers: `ENG-N`, `DES-N`. URL pattern: `https://linear.app/contorra/issue/<KEY>-<N>/<slug>`. Workspace name in URLs is `contorra`.
+Issue identifiers: `ENG-N`, `DES-N`, `REQ-N`. URL pattern: `https://linear.app/contorra/issue/<KEY>-<N>/<slug>`. Workspace name in URLs is `contorra`.
+
+**`REQ` is a ledger, not a work team.** It holds what the `ENG` Triage sweep deliberately does not take: user requests and ideas parked with a return condition. Public (anyone in the workspace can open a record), Triage off, no cycles, no projects or initiatives, no assignee, no priority. The only way in is a move from `ENG` at the sweep; the only ways out are `Promoted` (work created in `ENG` / `DES`, linked from the record) or `Declined` (with a reason label). Repeat reports are filed into `ENG` Triage as usual and marked `Duplicate` against the `REQ` record. Role plugins other than PM read `REQ` and never write to it.
 
 ### Initiatives (strategic directions)
 
@@ -108,6 +113,17 @@ GitHub integration (branch → `In Progress`, ready → `In Review`, merge → `
 | `Canceled` | canceled | Won't ship. |
 | `Duplicate` | duplicate | Same as another issue. |
 
+**`REQ`** — 5-status set (one per Linear category, each meaningful; no `Triage`):
+
+| Name | Type | Meaning |
+|---|---|---|
+| `Parked` | backlog | Default on arrival from `ENG`. Return condition in a comment (a date is also set as due date). |
+| `Up for review` | unstarted | Raised for the next review: a duplicate landed, or the return condition came due. |
+| `Promoted` | started | Work exists in `ENG` / `DES` and the record links it. Open until that work ships. |
+| `Delivered` | completed | The linked work reached users. |
+| `Declined` | canceled | Not doing it; exactly one decline-reason label. |
+| `Duplicate` | duplicate | Same as another record. |
+
 ### Labels
 
 **`ENG`:**
@@ -128,6 +144,8 @@ Area labels are **not pre-created**. Add organically if filtering pressure shows
 | `Dev approved` | Title case | Dev | Set on `In Dev Review` → `Done` approve. Marks design as implementation-ready. |
 
 No Type group on `DES`. No `UI` (design issues are by definition UI).
+
+**`REQ`:** decline reasons only, set with `Declined`: `no demand`, `outside product`, `no capacity`, `answered by 2.0`. No Type group, no area labels.
 
 ### Priority
 
@@ -159,7 +177,7 @@ One paragraph at most on Project and on out-of-Project Issues. **In-Project Issu
 These hold across the entire tracker. Violations break downstream conventions.
 
 1. **No reassignment on review handoff.** Assignee = owner (the actor who carries the issue to `Done`), never the reviewer. Design Issue assignee = designer all the way; Impl Issue assignee = dev all the way. Reviewers communicate via comment + @-mention; status transitions are made by whoever's call it is (owner moves work into a review state; reviewer approves / rejects). Rationale: "what am I on the hook for" dashboards must answer *who delivers*, not *who looked at it most recently*.
-2. **Triage routing is `ENG` only.** All non-PM-created `ENG` issues land in `Triage`. PM sweep (daily or as items arrive) sets priority, type label, project, assignee, then transitions to `Backlog` (or `Todo` + cycle if pre-committed). PM-created issues skip `Triage`. `DES` has no `Triage` — ad-hoc design requests come via Slack and the PM creates the issue directly in `Backlog`.
+2. **Triage routing is `ENG` only.** All non-PM-created `ENG` issues land in `Triage`. PM sweep (daily or as items arrive) sets priority, type label, project, assignee, then transitions to `Backlog` (or `Todo` + cycle if pre-committed). PM-created issues skip `Triage`. `DES` has no `Triage` — ad-hoc design requests come via Slack and the PM creates the issue directly in `Backlog`. A Triage item the team deliberately does not take is **moved to `REQ` as `Parked`** with a return condition; it is never left in `ENG` `Backlog`, which holds only work the team intends to do.
 3. **`UI` label semantics.** PM sets `UI` at creation when the Impl Issue changes the user interface and needs a `Design Review` pass. The assignee (dev) can dispute via comment + label removal; PM should not silently re-set it. Lives outside the `Type` group.
 4. **Marker labels persist across bounces.** `Design approved`, `QA approved`, `Dev approved` survive when an issue bounces back to `In Progress` from a later review. The next `In Staging` skips the already-cleared phase unless the relevant surface actually changed again. Re-entry doesn't redo passed gates.
 5. **Tracker language is English.** All tracker content — titles, descriptions, comments — is written in English, regardless of the conversation language around it. The tracker is the English-language canonical record; Slack and meetings can be Russian. Items that arrive in Russian (e.g., Triage submissions) get translated when processed.
@@ -168,7 +186,7 @@ These hold across the entire tracker. Violations break downstream conventions.
 
 ### Always scope by team
 
-Pass `team: "Events Engineering"` or `team: "Events Design"` (or the team UUID — see § Map) on every list / get tool that accepts it. Without it, queries pull workspace-wide, including `Artem Personal` and any other private teams.
+Pass `team: "Events Engineering"`, `team: "Events Design"` or `team: "Feature requests"` (or the team UUID — see § Map) on every list / get tool that accepts it. Without it, queries pull workspace-wide, including `Artem Personal` and any other private teams. Moving an issue between teams is `save_issue` with `id` plus the target `team` and an explicit `state` (e.g. `team: "Feature requests", state: "Parked"`); the identifier changes and the old one redirects.
 
 ### `list_issues`
 

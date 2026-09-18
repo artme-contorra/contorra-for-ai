@@ -77,7 +77,7 @@ For each entry, present the batch:
 - `ENG-N` — title.
 - Decisions: priority, labels (`bug|feature|chore|tech-debt` + optional `UI`), project (or "standalone"), assignee.
 - Description addition if any.
-- Target state: `Backlog` (default) or `Todo` + `cycle: "<n>"` (only if explicitly pre-committed to the active cycle — usually for an urgent item the team agreed to pull in immediately).
+- Target state: `Backlog` (default) or `Todo` + `cycle: "<n>"` (only if explicitly pre-committed to the active cycle — usually for an urgent item the team agreed to pull in immediately), **or park** — see § Parking below. `Backlog` holds only work the team intends to do; an entry it deliberately does not take is parked, never left in `Backlog`.
 
 Single confirmation per entry, then:
 
@@ -96,6 +96,23 @@ mcp__linear-server__save_issue
 `labels` on `save_issue` replaces the label set on the issue. If the entry came in with a pre-set label (rare for Triage), include it in the array to keep it. Marker labels (`Design approved`, `QA approved`) are not set at Triage — they appear later in the flow.
 
 `blockedBy` / `blocks` / `relatedTo` are append-only — pass them on this call only if a dependency surfaced during sweep (see `SKILL.md` → § MCP-tool guide → `save_issue` — update).
+
+### Parking (the entry is not being taken)
+
+A request, idea, or non-blocking bug the team deliberately does not take moves to the `REQ` team (`Feature requests`) — a ledger, not a work queue (see `events-tracker-base` → § Map). The four facets above are **not** set; the entry keeps its title, description, author and comments and gets exactly two things:
+
+- a one-line comment with the **return condition** — a date (also set as `dueDate`), a threshold, or a named event. "Someday" is not a condition; an entry without one is not parked, ask instead;
+- the move itself, its own per-call confirmation (the issue leaves the `ENG` board):
+
+```
+mcp__linear-server__save_issue
+  id: "ENG-N"
+  team: "Feature requests"
+  state: "Parked"
+  dueDate: "YYYY-MM-DD"     # only for a dated condition
+```
+
+The identifier changes to `REQ-N`; the old `ENG-N` redirects. A later report of the same thing arrives in `ENG` Triage as usual and is marked `Duplicate` against the `REQ` record (separate confirmation), which is then moved to `Up for review`. If the host workspace has its own triage-sweep skill, its routing grid decides what is parked; this section is only the mechanics.
 
 ### 4. Move to the next entry
 
