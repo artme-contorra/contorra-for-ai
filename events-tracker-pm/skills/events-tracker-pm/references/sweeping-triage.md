@@ -51,7 +51,7 @@ For Triage-incoming items the creator (often a teammate or support) usually didn
 
 #### 2d. Project
 
-- `mcp__linear-server__list_projects team:"Events Engineering"` if needed to refresh the snapshot in `SKILL.md` → § Map → Projects.
+- `mcp__linear-server__list_projects team:"Events Engineering"` to see the current Projects — the live list isn't stored in `SKILL.md` (see § Map → Projects).
 - If the issue fits an existing Project, pass `project: "<name>"`.
 - If not, leave unattached — out-of-Project work is a normal default for small / one-off items (see `SKILL.md` → § Ontology — condensed → Entity gradient).
 - If the issue is big enough to be its own Project but isn't yet, flag in chat: "this looks Project-sized — promote, or sweep as standalone Issue?". Don't silently create a Project mid-sweep.

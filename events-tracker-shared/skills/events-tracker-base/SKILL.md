@@ -25,7 +25,7 @@ description: >
   even when Linear isn't named explicitly. Strictly scoped to the two Events
   teams; `Artem Personal` and any other Linear teams are out of scope.
   Trigger phrases: "events tracker", "ENG / DES", "ENG-N", "DES-N",
-  "трекер events", "Stability / AI Platform / UX initiative", "Events Project",
+  "трекер events", "Events initiative", "Events Project",
   "что в трекере events".
 ---
 
@@ -57,21 +57,11 @@ Issue identifiers: `ENG-N`, `DES-N`. URL pattern: `https://linear.app/contorra/i
 
 ### Initiatives (strategic directions)
 
-| Name | ID | One-line direction |
-|---|---|---|
-| `Stability` | `03a75eda-b4db-493f-8c3d-3dc70d588837` | Stop high-impact failures from reaching organizers. Monitoring, CI, tests, staged rollout. |
-| `AI Platform` | `277b7df7-116d-4df7-8570-e0db1791826d` | Make Events drivable from outside its UI. One API for web + mobile + LLMs. |
-| `UX` | `c0090932-e01e-4ba6-8ac4-f0d7d43d510f` | Reduce friction in the organizer's path. Session replay + qualitative loop. |
+Initiatives are strategic banners — cross-quarter, no owner — that projects opt into. The live set drifts and is intentionally **not hardcoded here**: resolve current names + IDs at execution time via `list_initiatives` (scope to the Events teams). Attach a project to one via `addInitiatives: ["<initiative name>"]` on `save_project`; projects can also live without an initiative.
 
-`Growth / Marketing` initiative (`3e481c2e-...`) is pending deletion — UI-only delete, the Linear MCP has no `delete_initiative`. Don't attach new projects to it.
+### Projects — shape, not a registry
 
-### Projects — snapshot (not load-bearing)
-
-Snapshot as of 2026-06-04; refresh via `list_projects team:"Events Engineering"` (and same for `Events Design`):
-
-- **Cross-team** (both `ENG` + `DES`): `[Events] Test` (sandbox), `Automated testing` (Stability), `Additional formats`.
-- **`ENG` only:** `Customizable team names`, `Security` (Stability), `CI & release pipeline` (Stability), `Error monitoring` (Stability), `Session replay` (UX), `Backend refactor` (AI Platform).
-- All current projects are in `Backlog` status except `[Events] Test` (Planned). Most have no lead set yet.
+Projects are either **cross-team** (`addTeams: ["Events Engineering", "Events Design"]` — work spans design + impl) or **single-team** (`ENG`-only for no-UI / backend / infra work). Each may attach to one initiative or none, and carries a lead (= the responsible dev). The live list drifts and is **not stored here** — always resolve via `list_projects team:"Events Engineering"` (and same for `Events Design`).
 
 ## Ontology — condensed
 
@@ -79,7 +69,7 @@ This section is the self-contained operating canon for the ontology — no exter
 
 ### Entity gradient (Initiative → Project → Issue → Sub-issue)
 
-- **Initiative** — strategic banner, cross-quarter. Opt-in for projects. No owner. Three live: `Stability`, `AI Platform`, `UX`.
+- **Initiative** — strategic banner, cross-quarter. Opt-in for projects. No owner. Live set resolved via `list_initiatives` — not hardcoded.
 - **Project** — time-bounded deliverable. **Cross-team container** — attach `ENG` + `DES` when the work spans design + impl. Threshold from Issue: work spans weeks and naturally splits across roles. Lead = the responsible dev (= future Impl Issue assignee). Description required (one paragraph max).
 - **Issue** — single assignee, discrete unit.
   - *Inside Project:* role-split into Design Issue (`DES`, assignee = designer) + Impl Issue (`ENG`, assignee = dev). Description minimal or skipped — context lives in Project description.
@@ -215,7 +205,7 @@ Required for create: `team`, `title`. Common pattern:
 
 - Create: `name` + at least one of `addTeams` / `setTeams`. For cross-team Projects: `addTeams: ["Events Engineering", "Events Design"]`.
 - `lead: "<displayName>"` — the responsible dev (= future Impl Issue assignee).
-- `addInitiatives: ["Stability"]` to attach to an initiative. Projects can also live without an initiative.
+- `addInitiatives: ["<initiative name>"]` to attach to an initiative (resolve the name via `list_initiatives`). Projects can also live without an initiative.
 - `description` — one paragraph (brevity rule).
 - `priority: 0–4` — coarse, intuition-based.
 
@@ -236,7 +226,7 @@ Required for create: `team`, `title`. Common pattern:
 
 ### Initiative deletion gotcha
 
-There is **no `delete_initiative`** MCP tool. Initiative deletion is UI-only in Linear. `Growth / Marketing` is pending UI-only delete; don't try to delete via MCP.
+There is **no `delete_initiative`** MCP tool. Initiative deletion is UI-only in Linear; don't try to delete one via MCP.
 
 ### String encoding
 

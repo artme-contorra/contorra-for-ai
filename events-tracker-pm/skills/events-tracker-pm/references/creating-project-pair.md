@@ -16,7 +16,7 @@ Pull the feature name and the scope of work from conversation context. Confirm i
 - **Titles for the two Issues** — each names its own deliverable, readable without the Project context (see § Issue titles below). Draft both here; confirm with the rest of the batch.
 - **One-paragraph description** for the Project: the problem, the scope, what "done" looks like. This is the shared context for both Issues (per the brevity rule — see `SKILL.md` → § Ontology — condensed → Brevity rule).
 - **Responsible dev** — one of the `ENG` devs. They will be Project lead and Impl Issue assignee.
-- **Initiative** — `Stability`, `AI Platform`, `UX`, or none. Most cross-role features attach to one. If unclear, ask: "под какую initiative — `Stability` / `AI Platform` / `UX` / без?".
+- **Initiative** — one of the live initiatives (resolve via `list_initiatives`) or none. Most cross-role features attach to one. If unclear, ask which initiative it belongs under — offer the current list, or "без".
 - **Priority** — `1` Urgent, `2` High, `3` Medium (default), `4` Low.
 
 If any of these are unclear, ask in one turn (batch the missing fields). Do not invent defaults beyond the priority default.
@@ -92,7 +92,7 @@ mcp__linear-server__save_project
   description: "<one paragraph>"
   addTeams: ["Events Engineering", "Events Design"]
   lead: "<dev displayName>"           # resolved in step 2
-  addInitiatives: ["Stability"]        # or "AI Platform" / "UX" / omit
+  addInitiatives: ["<initiative name>"]  # resolve via list_initiatives; or omit
   priority: 3                          # 0–4, defaults to Medium
 
 # 2. Create the Design Issue (DES)
