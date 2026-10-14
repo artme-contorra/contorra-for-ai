@@ -1,7 +1,7 @@
 {
   "name": "events-tracker-shared",
-  "version": "0.4.2",
-  "description": "Map, ontology, invariants, and Linear MCP-tool guide for the Events tracker (teams ENG + DES, plus REQ as the ledger of parked requests). Auto-loaded as a dependency of any events-tracker-* role plugin. Bundles the Linear MCP server.",
+  "version": "0.5.0",
+  "description": "Map, ontology, invariants, and Linear MCP-tool guide for the Events tracker (teams ENG + DES, plus REQ as the ledger of parked requests and FEAT as the map of the product). Auto-loaded as a dependency of any events-tracker-* role plugin. Bundles the Linear MCP server.",
   "author": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"

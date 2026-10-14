@@ -22,8 +22,8 @@ There is no build/test/lint toolchain. The "code" is `SKILL.md` files, their
 - **MCP must be stdio.** Plugin-bundled `.mcp.json` must use `command`/`args` (see
   `events-tracker-shared/.mcp.json`). An HTTP-type (`"type":"http"`) entry does not
   register on install (verified 2026-06-04); `mcp-remote` bridges stdio → HTTP.
-- **Scope is the two Events teams only** (`ENG` Events Engineering, `DES` Events
-  Design). `Artem Personal` and any other Linear team are out of scope.
+- **Scope is the Events teams only** (`ENG` Events Engineering, `DES` Events
+  Design, `REQ` Feature requests, `FEAT` Features). `Artem Personal` and any other Linear team are out of scope.
 - **`events-tracker-public` is standalone and outsider-facing.** It does NOT
   depend on `events-tracker-shared` and must NOT carry internal process
   (invariants, labels, review/cycle mechanics). It reads both teams read-only
