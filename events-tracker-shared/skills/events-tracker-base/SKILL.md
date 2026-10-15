@@ -170,9 +170,9 @@ No Type group on `DES`. No `UI` (design issues are by definition UI).
 
 **`REQ`:** decline reasons only, set with `Declined`: `no demand`, `outside product`, `no capacity`, `answered by 2.0`. No Type group, no area labels.
 
-**`FEAT`:** four single-select groups, derived from the code and never set by hand: `core` (yes / no), `ui` (none /
-partial / yes), `wired` (none / partial / yes), `tests` (green / red / none). A feature with no console element has
-no `ui` or `wired`. A fifth group, `iteration` (`iteration: Alpha 1`, ...), names the iteration that opened the
+**`FEAT`:** five single-select groups, derived from the code and never set by hand: `core` (yes / no), `ui` (none /
+partial / yes), `wired` (none / partial / yes), `tests` (green / red / none), `design` (approved / pending / none, from the screens' design review). A feature with no console element has
+no `ui` or `wired`. A sixth group, `iteration` (`iteration: Alpha 1`, ...), names the iteration that opened the
 feature; it is set when an iteration starts, never by a role plugin. Project label `area` marks the area projects.
 
 ### Priority
