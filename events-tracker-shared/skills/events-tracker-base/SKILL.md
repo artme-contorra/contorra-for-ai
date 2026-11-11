@@ -66,7 +66,9 @@ grain (QA accepts it in one pass, it opens as a whole). Areas are projects with 
 the milestones `Alpha` / `Beta` / `Parity`, an iteration is a value of the label group `iteration` (`iteration: Alpha 1`). The
 assignee is the developer who owns the feature. Work on a feature is an `ENG` issue related to it. `FEAT`'s Git
 automations do nothing: a pull request that names `FEAT-N` never moves its status. Other places refer to `FEAT-N` and
-never copy its state. Canon: the ontology design § 3.1 (`D-035`).
+never copy its state. When a feature opens, its description becomes a frame for QA: a paragraph (what the user can
+do, in which variants), **Where:** (every entry point), **QA focus** (where to look closely and why; omitted when
+empty). No steps or checklists. Canon: the ontology design § 3.1 (`D-035`).
 
 ### Initiatives (strategic directions)
 
@@ -136,7 +138,7 @@ GitHub integration (branch → `In Progress`, ready → `In Review`, merge → `
 
 | Name | Type | Meaning | Moved by |
 |---|---|---|---|
-| `Triage` | triage | a QA finding outside the feature under test | QA files it |
+| `Triage` | triage | not used since 2026-11-11: findings on 2.0 go to `ENG` `Triage` as `2.0` bugs related to the feature (D-043) | — |
 | `Unstaged` | backlog | no stage decided | the seeding; Artem for a new feature |
 | `Planned` | unstarted | in a stage, nothing built | Artem, when he gives it a stage |
 | `In development` | started | some mark has left `none` / `no` | the seeding, then the registry sync |
@@ -154,6 +156,7 @@ GitHub integration (branch → `In Progress`, ready → `In Review`, merge → `
 | Label | Casing | Set by | When |
 |---|---|---|---|
 | `bug` / `feature` / `chore` / `tech-debt` | lowercase | PM — at create (own issues) or at Triage sweep (incoming) | Mandatory exactly-one. Linear **label group** `Type` enforces mutual exclusion natively. |
+| `1.0` / `2.0` | as written | Reporter if they know it, else PM at Triage sweep; PM at create | Mandatory exactly-one, label group `System`: which Events system the issue is about (1.0, the current Firebase product; 2.0, the new system). An issue touching both takes the system where it is fixed. Linear cannot require a label; the sweep does not let an issue leave `Triage` without `System` and `Type` (D-043). |
 | `UI` | all caps | PM at create | Impl Issue changes the UI and needs a `Design Review` pass. Assignee can dispute via comment + label removal. |
 | `Design approved` | Title case | Designer | Set on `Design Review` → `QA` approve. Survives bounces — a later QA reject doesn't undo it. |
 | `QA approved` | Title case | QA | Set on `QA` → `Done` approve. Survives bounces. |
@@ -205,11 +208,11 @@ One paragraph at most on Project and on out-of-Project Issues. **In-Project Issu
 These hold across the entire tracker. Violations break downstream conventions.
 
 1. **No reassignment on review handoff.** Assignee = owner (the actor who carries the issue to `Done`), never the reviewer. Design Issue assignee = designer all the way; Impl Issue assignee = dev all the way. Reviewers communicate via comment + @-mention; status transitions are made by whoever's call it is (owner moves work into a review state; reviewer approves / rejects). Rationale: "what am I on the hook for" dashboards must answer *who delivers*, not *who looked at it most recently*.
-2. **Triage routing: `ENG`, and `FEAT` apart.** All non-PM-created `ENG` issues land in `Triage`. PM sweep (daily or as items arrive) sets priority, type label, project, assignee, then transitions to `Backlog` (or `Todo` + cycle if pre-committed). PM-created issues skip `Triage`. `DES` has no `Triage` — ad-hoc design requests come via Slack and the PM creates the issue directly in `Backlog`. A Triage item the team deliberately does not take is **moved to `REQ` as `Parked`** with a return condition; it is never left in `ENG` `Backlog`, which holds only work the team intends to do. `FEAT` has its own Triage for QA findings outside the feature under test; it is kept apart from `ENG`'s.
+2. **Triage routing: `ENG`, and `FEAT` apart.** All non-PM-created `ENG` issues land in `Triage`. PM sweep (daily or as items arrive) sets priority, type label, `System` label, project, assignee, then transitions to `Backlog` (or `Todo` + cycle if pre-committed). PM-created issues skip `Triage`. `DES` has no `Triage` — ad-hoc design requests come via Slack and the PM creates the issue directly in `Backlog`. A Triage item the team deliberately does not take is **moved to `REQ` as `Parked`** with a return condition; it is never left in `ENG` `Backlog`, which holds only work the team intends to do. `ENG` `Triage` is the one way in for both systems: a finding on 2.0 is an `ENG` issue labelled `2.0` and related to its `FEAT-N`; `FEAT` holds features only and its `Triage` is not used (D-043).
 3. **`UI` label semantics.** PM sets `UI` at creation when the Impl Issue changes the user interface and needs a `Design Review` pass. The assignee (dev) can dispute via comment + label removal; PM should not silently re-set it. Lives outside the `Type` group.
 4. **Marker labels persist across bounces.** `Design approved`, `QA approved`, `Dev approved` survive when an issue bounces back to `In Progress` from a later review. The next `In Staging` skips the already-cleared phase unless the relevant surface actually changed again. Re-entry doesn't redo passed gates.
 5. **Tracker language is English.** All tracker content — titles, descriptions, comments — is written in English, regardless of the conversation language around it. The tracker is the English-language canonical record; Slack and meetings can be Russian. Items that arrive in Russian (e.g., Triage submissions) get translated when processed.
-6. **`FEAT` statuses have owners.** QA moves `Ready for QA` to `QA passed` or `QA failed` and files `Triage`; Artem
+6. **`FEAT` statuses have owners.** QA moves `Ready for QA` to `QA passed` or `QA failed` and files findings into `ENG` `Triage`; Artem
    sets `Unstaged` and `Planned` (the stage), `Not porting`, and closes an opened feature back to `In development`;
    `In development`, `Ready for QA` and `Released`, the `iteration` label and every mark are an agent's at a sync
    point or in the iteration and release procedures; `Duplicate` is anyone's. A role plugin never sets a mark by hand.
@@ -240,7 +243,7 @@ Required for create: `team`, `title`. Common pattern:
 - `priority: 3` (Medium default).
 - `assignee: "<displayName>"` — resolve from § Map → Team or `list_users`. **Not** `assigneeId`.
 - `project: "<name>"` when inside a Project.
-- `labels: ["bug"]` (or `feature` / `chore` / `tech-debt`) on `ENG`. Bare label name, no `Type/` prefix even though Linear renders the group.
+- `labels: ["bug", "2.0"]` on `ENG`: one `Type` (`bug` / `feature` / `chore` / `tech-debt`) and one `System` (`1.0` / `2.0`). Bare label names, no `Type/` or `System/` prefix even though Linear renders the groups.
 - Add `"UI"` to the labels array when the Impl Issue changes the UI.
 - `blocks: ["ENG-12"]` / `blockedBy: ["DES-7"]` for cross-team dependency.
 

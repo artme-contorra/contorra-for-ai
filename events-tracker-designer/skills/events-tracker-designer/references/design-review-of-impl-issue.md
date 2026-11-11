@@ -100,10 +100,11 @@ mcp__linear-server__save_issue
   team: "Events Engineering"
   title: "<the finding — standalone-readable>"
   description: "<repro / expected vs actual / where it was noticed>"
-  labels: ["bug"]
+  labels: ["bug", "<1.0 or 2.0>"]
 ```
 
-A designer-created `ENG` issue lands in `Triage` (base Invariant 2 — only the PM skips it); the PM routes it at sweep. Description is **required** and **English** (Invariant 5).
+Add the `System` label for the system the finding is in (`1.0` or `2.0`, base § Labels; D-043); on `2.0` also pass
+`relatedTo: ["FEAT-N"]` for the feature it was found in. A designer-created `ENG` issue lands in `Triage` (base Invariant 2 — only the PM skips it); the PM routes it at sweep. Description is **required** and **English** (Invariant 5).
 
 **Extreme case — in-scope gap that must be its own tracked item** while still blocking the parent: same call but with `parentId: "ENG-N"` (base § Ontology → Sub-issue, use a). The parent stays in its review phase until the sub-issue reaches `Done`; @-mention the dev and PM in the review comment with the new `ENG-N` so the block is visible before the sweep. This is rare — reach for the checklist first.
 

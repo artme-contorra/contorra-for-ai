@@ -43,6 +43,13 @@ Exactly one of `bug` / `feature` / `chore` / `tech-debt` (bare label name — se
 
 Borderline (chore vs tech-debt, bug vs feature for an edge case) — state pick + reasoning; user can override in step 3.
 
+#### 2b'. `System` label
+
+Exactly one of `1.0` / `2.0` (label group `System`, D-043): which Events system the issue is about. `1.0` is the current
+Firebase product, `2.0` the new system (core, the console on `v2`, the agent). An issue touching both takes the system
+where it is fixed. A `2.0` bug gets a `relatedTo` link to its `FEAT-N`. Keep the reporter's label if it is right. An
+item moved to `REQ` takes no `System` label. No `ENG` issue leaves `Triage` without `System` and `Type`.
+
 #### 2c. `UI` label (separate question from type)
 
 Set `UI` if and only if the work changes the user interface and needs a `Design Review` pass downstream (see `SKILL.md` → § Invariants → `UI` semantics). PM is the one who sets it at creation/triage time; the dev can dispute later via comment + label removal.
@@ -75,7 +82,7 @@ Tracker language is English (base Invariant 5). If the entry's title or descript
 For each entry, present the batch:
 
 - `ENG-N` — title.
-- Decisions: priority, labels (`bug|feature|chore|tech-debt` + optional `UI`), project (or "standalone"), assignee.
+- Decisions: priority, labels (`bug|feature|chore|tech-debt` + `1.0|2.0` + optional `UI`), project (or "standalone"), assignee.
 - Description addition if any.
 - Target state: `Backlog` (default) or `Todo` + `cycle: "<n>"` (only if explicitly pre-committed to the active cycle — usually for an urgent item the team agreed to pull in immediately), **or park** — see § Parking below. `Backlog` holds only work the team intends to do; an entry it deliberately does not take is parked, never left in `Backlog`.
 
@@ -85,7 +92,7 @@ Single confirmation per entry, then:
 mcp__linear-server__save_issue
   id: "ENG-N"
   priority: 3
-  labels: ["feature", "UI"]
+  labels: ["feature", "2.0", "UI"]
   project: "<Project name>"           # omit if standalone
   assignee: "<dev displayName>"        # resolved per step 2e
   state: "Backlog"                     # or "Todo"

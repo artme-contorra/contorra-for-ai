@@ -70,10 +70,11 @@ mcp__linear-server__save_issue
   team: "Events Engineering"
   title: "<the finding — standalone-readable>"
   description: "<repro / expected vs. actual / staging reference>"
-  labels: ["bug"]
+  labels: ["bug", "<1.0 or 2.0>"]
 ```
 
-A QA-created `ENG` issue lands in `Triage` (base Invariant 2 — only the PM skips it); the PM routes it at sweep. `description` is **required** and **English** (Invariant 5). An out-of-scope finding alone is not a reason to reject — if the issue's own scope passes, approve and file the finding separately.
+Add the `System` label for the system the finding is in (`1.0` or `2.0`, base § Labels; D-043); on `2.0` also pass
+`relatedTo: ["FEAT-N"]` for the feature it was found in. A QA-created `ENG` issue lands in `Triage` (base Invariant 2 — only the PM skips it); the PM routes it at sweep. `description` is **required** and **English** (Invariant 5). An out-of-scope finding alone is not a reason to reject — if the issue's own scope passes, approve and file the finding separately.
 
 **Extreme case — in-scope gap that must be its own tracked item** while still blocking the parent: same call but with `parentId: "ENG-N"` (base § Ontology → Sub-issue, use a). The parent stays in `QA` (blocked) until the sub-issue reaches `Done` — don't approve a parent with open QA sub-issues. @-mention the dev (assignee) and PM with the new `ENG-N` so the block is visible before the sweep. This is rare — reach for the checklist first.
 
