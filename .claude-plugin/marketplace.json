@@ -1,6 +1,6 @@
 {
   "name": "contorra-for-ai",
-  "description": "Contorra internal plugins for AI-assisted work: Events tracker roles (PM / dev / designer / QA) and shared base.",
+  "description": "Contorra internal plugins for AI-assisted work: Events tracker roles (PM / dev / designer / QA) and shared base, plus Events 2.0 test builds and releases.",
   "owner": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"
@@ -35,6 +35,11 @@
       "name": "events-tracker-public",
       "source": "./events-tracker-public",
       "description": "Stakeholder-facing Events tracker access for people outside the dev team — read ENG + DES read-only, file requests into ENG Triage. Standalone; does not use events-tracker-shared."
+    },
+    {
+      "name": "events-release",
+      "source": "./events-release",
+      "description": "Test builds and releases of Events 2.0: cut a test build through CI and draft the QA post; take a checked build to prod with Artem starting the plan and apply, then mark FEAT features Released and draft the team post. Depends on events-tracker-shared."
     }
   ]
 }

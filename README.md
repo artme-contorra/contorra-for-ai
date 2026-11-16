@@ -1,6 +1,6 @@
 # contorra-for-ai
 
-Claude Code plugin marketplace for AI-assisted work at Contorra. Currently ships the **Events tracker** suite: a shared base plus one plugin per role on the Events team, so each person's Claude works the Linear tracker (teams `ENG` Events Engineering + `DES` Events Design) by the team's conventions — right scope, right guard-rails, right MCP-tool usage.
+Claude Code plugin marketplace for AI-assisted work at Contorra. Ships the **Events tracker** suite and the **Events release** plugin. The tracker suite is a shared base plus one plugin per role on the Events team, so each person's Claude works the Linear tracker (teams `ENG` Events Engineering + `DES` Events Design) by the team's conventions — right scope, right guard-rails, right MCP-tool usage.
 
 ## Plugins
 
@@ -11,6 +11,7 @@ Claude Code plugin marketplace for AI-assisted work at Contorra. Currently ships
 | `events-tracker-designer` | Designer | Self-pull Design Issues in `DES`, submit for dev review, respond to bounces, review impl on staging in `Design Review`. |
 | `events-tracker-dev` | Web devs | Pick up Impl Issues; on 1.0 walk `In Progress → In Review → In Staging` and hand off to Design Review / QA; on 2.0 leave `In Review` and `QA` to Linear's GitHub integration; respond to bounces, sign off on designs for implementability. |
 | `events-tracker-qa` | QA | Pick up Impl Issues in `QA` (on staging for 1.0, on the test stand for 2.0), approve to `Done` (1.0: released to prod; 2.0: checked on test) or reject with a checklist, route out-of-scope findings to Triage. |
+| `events-release` | Whoever cuts a build or runs a release (Artem, devs) | Cut an Events 2.0 test build through the test-build CI workflow and draft the QA post (`cutting-a-test-build`); take a checked build to prod: read the gate, hand Artem the plan and apply workflows (only he starts them), mark `FEAT` features `Released`, draft the team post (`releasing`). Depends on `events-tracker-shared` for Linear. The CI workflows it drives are provisional, named in `events-release/references/workflows.md`. |
 | `events-tracker-public` | Leadership / stakeholders (outside dev) | Read ENG + DES read-only (issue status, what's in flight, find by topic, project & initiative summaries); file requests into ENG Triage. Standalone — does not use `events-tracker-shared`. |
 
 Each role plugin depends on `events-tracker-shared`; installing a role pulls the base automatically. Install exactly one role plugin — it pairs with the base to read as one combined context.
@@ -24,7 +25,7 @@ Each role plugin depends on `events-tracker-shared`; installing a role pulls the
 /plugin install events-tracker-dev@contorra-for-ai
 ```
 
-Swap the last line for your role: `events-tracker-pm`, `events-tracker-designer`, or `events-tracker-qa`. Don't install `events-tracker-shared` directly — it comes in as a dependency.
+Swap the last line for your role: `events-tracker-pm`, `events-tracker-designer`, or `events-tracker-qa`. Don't install `events-tracker-shared` directly — it comes in as a dependency. Whoever cuts builds or releases also installs `events-release@contorra-for-ai` beside their role plugin.
 
 ## Linear MCP
 

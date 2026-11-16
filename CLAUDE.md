@@ -2,7 +2,8 @@
 
 Claude Code plugin marketplace for Contorra. Ships the **Events tracker** suite:
 `events-tracker-shared` (base) + one role plugin each for PM / designer / dev / QA,
-plus `events-tracker-public` — a standalone plugin for stakeholders outside the dev team.
+plus `events-tracker-public` (a standalone plugin for stakeholders outside the dev team), and
+`events-release` (test builds and releases of Events 2.0).
 See `README.md` for the plugin map, install, and MCP setup — not repeated here.
 
 There is no build/test/lint toolchain. The "code" is `SKILL.md` files, their
@@ -37,6 +38,10 @@ There is no build/test/lint toolchain. The "code" is `SKILL.md` files, their
 - `events-tracker-shared/` — base catalog/ontology/invariants + bundled Linear MCP; a
   dependency of every role, never installed directly.
 - `events-tracker-{pm,designer,dev,qa}/` — one role each; each depends on shared.
+- `events-release/` — two skills, `cutting-a-test-build` and `releasing`; depends on shared for
+  Linear. Judgement lives in the skills, mechanics in CI workflows in Surfaces. The workflows are
+  named only in `events-release/references/workflows.md` (shared by both skills); keep it the one
+  place. The agent never starts the prod workflows and sends no post.
 - `events-tracker-public/` — standalone outsider-facing plugin; bundles its own
   Linear MCP; no dependency on shared. One skill: thin ontology + read recipes +
   Triage filing.
