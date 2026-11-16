@@ -10,7 +10,7 @@ All steps run in chat. Transition to `In Progress` is one write; confirm once.
 
 The PM plans the cycle: Impl Issues land in `Todo` attached to the active cycle, assigned to you. You don't self-pull from `Backlog` — that's the PM's cycle-planning move. Your entry point is `Todo` for the current cycle.
 
-When the GitHub integration is on, opening a branch / draft PR will flip the issue to `In Progress` automatically. Until then it's a manual transition — this flow (base § Statuses → `ENG`).
+`In Progress` is yours to set on both systems. On 1.0 the later moves are manual too, as these plugins describe it. On 2.0 the moves after this one are Linear's GitHub integration's: a PR that names the issue moves it to `In Review`, the merge to `QA` (base § Statuses → ENG flow on 2.0).
 
 ## Procedure
 
@@ -71,4 +71,4 @@ mcp__linear-server__save_issue
 
 - **You don't self-pull from `Backlog`.** Cycle planning (Backlog → Todo) is the PM's move (`events-tracker-pm` → `cycle-planning.md`). If `Todo` is empty and you have capacity, that's a planning gap — raise it, don't pull unplanned work into the cycle yourself.
 - **Self-test posture starts now.** The PR self-test checklist and the design/QA phases downstream validate your work; they're not where bugs are first found (delivery-flow § 3). Build with that bar from `In Progress` onward.
-- **Manual transitions are temporary.** Once the GitHub integration is live, `In Progress` / `In Review` / `In Staging` follow branch / PR / merge automatically; this manual step goes away (base § Statuses → `ENG`).
+- **What happens after `In Progress` depends on the system.** On 1.0 you walk the issue on by hand (`handoff-after-staging.md`). On 2.0 you don't touch its status again: the integration moves it, and the PR must name the `ENG-N` so it can.

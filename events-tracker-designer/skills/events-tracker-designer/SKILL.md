@@ -42,7 +42,7 @@ Designer role for the Events tracker. This skill defines the designer-specific s
 - **Self-pulls Design Issues** from `DES` `Backlog`: self-assign + transition to `Todo` (the one self-assign moment), then `In Progress` when starting.
 - **Walks own `DES` statuses** to `In Dev Review`, submitting the macro with an @-mention to the responsible dev (Project lead).
 - **Responds to a dev rejection** on an own Design Issue bounced back to `In Progress`: addresses the checklist, returns to `In Dev Review`.
-- **Reviews impl on staging** for Impl Issues in `ENG` `Design Review` (dev @-mentioned the designer): compares staging against the Figma macro; approves (set `Design approved` + `QA` + @-mention QA) or rejects (checklist comment + `In Progress` + @-mention dev).
+- **Reviews impl on staging** for 1.0 Impl Issues in `ENG` `Design Review` (dev @-mentioned the designer): compares staging against the Figma macro; approves (set `Design approved` + `QA` + @-mention QA) or rejects (checklist comment + `In Progress` + @-mention dev). A 2.0 issue never enters `Design Review`: its screens are reviewed in the repository, and Linear's GitHub integration moves it from `In Review` to `QA` on merge (base § Statuses → ENG flow on 2.0). The designer moves no status on a 2.0 `ENG` issue.
 - **Routes out-of-scope findings to `Triage`** as new standalone `ENG` issues (in-scope findings go in the rejection checklist). Sub-issue on the parent — extreme case only (base § Ontology → Sub-issue).
 
 ### What the designer does NOT do

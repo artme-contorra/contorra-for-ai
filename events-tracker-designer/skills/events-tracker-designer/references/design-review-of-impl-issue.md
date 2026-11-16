@@ -1,5 +1,7 @@
 # Design review of an Impl Issue on staging
 
+**1.0 only.** A 2.0 issue has no `Design Review` status in `ENG`: the design review of 2.0 screens lives in the repository, and the issue goes from `In Review` to `QA` on merge through Linear's GitHub integration (base § Statuses → ENG flow on 2.0). A design finding on 2.0 is still filed into `ENG` `Triage` as below (§ 5), labelled `2.0` and related to its `FEAT-N`.
+
 Recipe for the designer's review duty on `ENG`: an Impl Issue sits in `Design Review` (the dev @-mentioned the designer after staging), compare the staging build against the Figma macro, then approve to `QA` or reject to `In Progress`. Loaded on demand from `events-tracker-designer` → `SKILL.md` → § References pointer. Entry-point trigger: "проверь impl на стейджинге", "design review для ENG-N", "review the implementation against the macro", "что мне на дизайн-ревью".
 
 Out of scope: own Design Issues in `DES` (see the other refs). The dev's bounce-handling and QA's own review — those are other roles' flows. Moving an Impl Issue in any status other than `Design Review` — the designer only touches it on this review call (`SKILL.md` → § Role scope → What the designer does NOT do).

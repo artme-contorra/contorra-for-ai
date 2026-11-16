@@ -62,7 +62,9 @@ A minimal map — just enough to read and to file. Nothing more is needed here.
   - **Not started** — `Triage`, `Backlog`, `Todo`.
   - **In progress** — anything actively being worked or reviewed; on `REQ`,
     `Promoted` (work has been opened for it).
-  - **Done** — shipped; on `REQ`, `Delivered`.
+  - **Done**: shipped; on `REQ`, `Delivered`. For work on Events 2.0, the
+    new system, `Done` means checked on the test system; it reaches users with
+    the next release, which the team announces.
   - **Won't ship** — `Canceled`, `Duplicate`; on `REQ`, `Declined`.
   - **Parked** (`REQ` only) — `Parked`, `Up for review`: not being worked on,
     revisited under the condition written on the record.
