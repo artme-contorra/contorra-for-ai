@@ -36,17 +36,27 @@ wait". The last one is a reason not to build.
 
 ## 3. Dispatch and wait
 
-- **Spent versions first.** Read the previous test-build run (`gh run list`, then
-  `gh run view <id> --json conclusion,jobs`). If it ended untagged (its `tag the pair and record the
-  manifest` job failed, or never ran, and no `v<version>` tag exists for it) after any family's build
-  or deploy job ran, its version may be spent: its images may already be pushed. That run's "Not
-  tagged" note names the `skipped` value to pass; it is on the run page only, so ask Artem to read it
-  out, or derive it: the run's version was one past the highest `v2.<stage>.*` tag, or one past the
-  highest `skipped` it was given. Pass every spent version since the last tag, accumulated and
-  space-separated (`-f skipped="2.2.4 2.2.5"`). A version not named that way makes the next build's
-  tagging refuse the gap; a version named that was never spent wastes a number.
+- **After a failed build: retry, or skip.** Read the previous test-build run (`gh run list`, then
+  `gh run view <id> --json conclusion,jobs`). If it ended untagged (its `Tag & manifest` job failed
+  or never ran, and no `v<version>` tag exists for it), decide by whether a `main` moved since:
+  - **Neither Core's nor Surfaces' `main` moved:** retry with the same inputs (the same `stage`, the
+    same `skipped`, or none). The build takes the same number again and deploys the images already
+    pushed as that version, without rebuilding them. Core's build gets the same rule in Core#64; until
+    that is on Core's `main`, a retry fails in `Core → test` whenever the failed run had pushed Core's
+    images: say so, and the build waits for a new commit on Core's `main`.
+  - **A `main` moved, and the failed run pushed an image of its version:** that version is spent. Pass
+    it, with every version spent before it since the last tag, as `skipped`, space-separated
+    (`-f skipped="2.2.4 2.2.5"`). A repository that did not move and had pushed an image of the spent
+    version cannot build until its `main` gets a new commit: say which.
+  - The run's "Not tagged" note says the same and names the value; it is on the run page only, so ask
+    Artem to read it out, or derive the version: one past the highest `v2.<stage>.*` tag, or one past
+    the highest `skipped` the run was given. Whether an image was pushed: the build job of that family
+    succeeded (Core: `Core → test`'s Core run; Surfaces: `Surfaces → test / <family>`).
+  - Compose checks `skipped` before anything deploys: a version that is not a gap from the next
+    untagged number on stops the run with nothing deployed.
 - Dispatch the test-build workflow from `main` of Surfaces (workflows.md § Commands). Pass `stage`
-  only when Artem named a new one, `skipped` only as above.
+  only when Artem named a new one, `skipped` only as above. The run is titled
+  `Test build · current stage` (or `· stage <n>`).
 - Find the run it started (`gh run list`, the newest `workflow_dispatch` run created after the
   dispatch) and give its URL.
 - Watch it to the end (`gh run watch --exit-status`). The run deploys to the shared test stand; tell
@@ -59,17 +69,18 @@ wait". The last one is a reason not to build.
   is not readable with `gh run view`): version, commits, Proto pin, images, `behind:`, `scenarios:`,
   merged PRs and their `ENG` issues. Check the version tag exists on both Core and Surfaces.
 - **Red.** `gh run view <id> --json conclusion,jobs`, the run's `::error::` annotations, then
-  `--log-failed`. Name the job by its role (workflows.md § Jobs): compose (the reads of § 2 found
-  late, the numbering, or "nothing moved"), Core's deploy (a separate Core run: follow its URL in the
-  job's log), a Surfaces family's build and deploy, the scenarios, or the tagging. Give the first
+  `--log-failed`. Name the job (workflows.md § Runs and jobs): `Compose` (the reads of § 2 found
+  late, the numbering, a `skipped` that is no gap, or "nothing moved"), `Core → test` (a separate Core
+  run, `Deploy all → test · <version>`: follow its URL in the job's log), `Surfaces → test / <family>`,
+  the scenarios, or `Tag & manifest`. Give the first
   failing line in plain words. A deploy failure leaves test on the previous build or partly updated:
-  say which families moved. A failure before the tagging leaves the version untagged and maybe spent:
-  say so, and carry it into the next dispatch (§ 3).
+  say which families moved. A failure before the tagging leaves the version untagged: say so, and whether
+  the next dispatch is a retry with the same inputs or carries it as `skipped` (§ 3).
 - **Tagged, scenarios red.** The run is red but the build is tagged and on test: the tagging job
   stops after the tag with "deployed and tagged, but the scenarios on test are ...". The build is not
   fit for QA and cannot be released: say so and do not draft a QA post for it.
-- Never re-run a red run blindly. On a test-build run only: re-run a job that failed on the machine
-  (network, a runner restart), once, and say so. A red check on the code needs a fix PR and a new
+- Never retry a red run blindly. On a test build only: when a job failed on the machine (network, a
+  runner restart), retry once by dispatching again with the same inputs (§ 3), and say so. A red check on the code needs a fix PR and a new
   build. Plan, apply and prod runs are never re-run by the agent (workflows.md § Commands).
 
 ## 5. What the build does not do

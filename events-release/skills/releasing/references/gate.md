@@ -54,10 +54,9 @@ Loaded from `releasing` → `SKILL.md` steps 2 and 3. Commands and the workflow 
   hours.
 - A red nightly on a descendant is red unless the failure is shown to be in a commit after the build.
   A red nightly the plan ran itself is judged the same way: show whether the failing commit is after
-  the build. Today a known issue cannot carry a red nightly (Surfaces #226 at `370139548`): the plan
-  counts only a green nightly, runs one on `main` when there is none, and a red nightly it ran fails
-  the plan run whatever `known_issues` says, so the apply refuses the version. A red nightly needs a
-  fix, a green nightly and a new plan; say so before handing Artem the plan.
+  the build. A known issue may carry a red nightly: the plan's `Summary` passes on a red nightly when
+  `known_issues` names one, and the apply goes by `Summary`, even though the plan run as a whole shows
+  red when a nightly it ran failed.
 
 ## Known issues
 
@@ -74,9 +73,10 @@ Each carries three things, written so someone outside the room can read them lat
 The agent drafts the wording; Artem accepts or changes it before the plan runs. The plan command then
 carries them joined into one line, e.g.
 `-f known_issues="ENG-240: <what>, not a blocker because <why>, accepted by Artem; ENG-244: ..."`.
-A red part of the gate with no accepted known issue stops the release; on the workflow's side, red
-scenarios with an empty `known_issues` fail the plan (a red nightly fails it either way, Part 3), and
-the apply refuses a version with no successful plan.
+A red part of the gate with no accepted known issue stops the release; on the workflow's side, a red
+scenarios or nightly part with an empty `known_issues` fails the plan's `Summary` job, and the apply
+refuses a version whose latest completed plan did not pass `Summary`. A newer failed plan overrides an
+older green one, so a plan rerun to change the known issues must itself pass.
 
 ## What to show Artem
 
