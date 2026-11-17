@@ -1,6 +1,6 @@
 # The scope and the prod gate
 
-Loaded from `releasing` → `SKILL.md` steps 2 and 3. Commands and the workflow names are in
+Loaded from `releasing` → `SKILL.md` steps 2 to 4. Commands and the workflow names are in
 `../../../references/workflows.md`.
 
 ## The scope
@@ -32,6 +32,10 @@ Loaded from `releasing` → `SKILL.md` steps 2 and 3. Commands and the workflow 
 - QA accepts a feature on the test stand. Check that QA's pass was on this build or one whose change to
   that feature this build does not alter; if QA passed it on an older build and this build changed it,
   say so (that is a judgement for Artem, not a green).
+- Open, Artem's: what passes QA gave on earlier builds mean for this one when many PRs merged since
+  (for the first CI release, the passes given on 2.2.0 / 2.2.1 against 2.2.3). Ask him in one line
+  whether QA rechecks the scope on this build or he accepts the earlier passes; do not choose, and
+  do not count such a feature green until he answers.
 
 ## Part 2: no open blocker in `ENG` `Triage`
 
@@ -44,26 +48,30 @@ Loaded from `releasing` → `SKILL.md` steps 2 and 3. Commands and the workflow 
   `Triage` that touches a feature in scope is read, not skipped.
 - An open blocker is red. It ships only as a known issue Artem accepts.
 
-## Part 3: a green nightly
+## Part 3: the prod dry runs
 
-- The nightly runs on `main` of Core and of Surfaces (`nightly.yml`). For each repository, find the latest green
-  nightly run and its commit, and check that commit is the build's commit or a descendant of it:
-  `gh api repos/<repo>/compare/<build sha>...<nightly sha> --jq .status` answers `identical` or `ahead`.
-- No such run is not red: the plan then runs the nightly on `main`, a descendant of the build (not on
-  the build's own commits), before it summarises. Say that the plan will take longer, up to several
-  hours.
-- A red nightly on a descendant is red unless the failure is shown to be in a commit after the build.
-  A red nightly the plan ran itself is judged the same way: show whether the failing commit is after
-  the build. A known issue may carry a red nightly: the plan's `Summary` passes on a red nightly when
-  `known_issues` names one, and the apply goes by `Summary`, even though the plan run as a whole shows
-  red when a nightly it ran failed.
+- Read in the plan run, after Artem starts it (`SKILL.md` step 4, § Reading the plan below): Core's
+  two dry runs and each Surfaces family's. Green only when every one passed.
+- A failed dry run fails the plan's `Summary` whatever `known_issues` says: no known issue covers it.
+  The answer is a fix (a precondition, a form, the next build).
+- Before the plan runs, this part is "not read yet", not green.
+
+## The nightly: read, not gating
+
+- The nightly (on `main` of Core and of Surfaces, mutation included; `workflows.md`) is a standing measure
+  of the tests, not part of the gate. The plan runs none and waits for none; it reads the latest green
+  nightly on a descendant of the build and shows it as "read, not gating".
+- Report it in one line per repository: the latest nightly's result and commit, and whether that
+  commit carries the build (`gh api repos/<repo>/compare/<build sha>...<nightly sha> --jq .status`
+  answers `identical` or `ahead`). A red or missing nightly is information for Artem, not a red part
+  and not a known issue.
 
 ## Known issues
 
 A known defect ships only as a written known issue in the release record: the plan's summary, which
 gets it from the plan's `known_issues` input (one line). That input is the only way a known issue
 reaches the record, so every accepted exception goes in it, Linear-side ones included (a feature not
-`QA passed`, a Triage blocker), not only the parts the workflow reads itself (scenarios, nightlies).
+`QA passed`, a Triage blocker), not only the part the workflow reads itself (scenarios).
 Each carries three things, written so someone outside the room can read them later:
 
 - **What**: the defect, with its `ENG-N`.
@@ -73,13 +81,44 @@ Each carries three things, written so someone outside the room can read them lat
 The agent drafts the wording; Artem accepts or changes it before the plan runs. The plan command then
 carries them joined into one line, e.g.
 `-f known_issues="ENG-240: <what>, not a blocker because <why>, accepted by Artem; ENG-244: ..."`.
-A red part of the gate with no accepted known issue stops the release; on the workflow's side, a red
-scenarios or nightly part with an empty `known_issues` fails the plan's `Summary` job, and the apply
+A red part of the gate with no accepted known issue stops the release; on the workflow's side, red
+scenarios with an empty `known_issues` fail the plan's `Summary` job, and the apply
 refuses a version whose latest completed plan did not pass `Summary`. A newer failed plan overrides an
-older green one, so a plan rerun to change the known issues must itself pass.
+older green one, so a plan rerun to change the known issues must itself pass. The workflow checks only
+that `known_issues` is not empty, not that it names the red part: that every red part is covered, and
+covered in words someone can read later, is this skill's check.
+
+The record lives only in the plan run's summary, which goes with the run's retention; the `prod/v` tag
+names the run but does not carry the known issues. Whether to keep them elsewhere is Artem's open
+question (`workflows.md` § Open): if the release has known issues, ask him in one line where they are
+kept beyond the run; do not choose.
 
 ## What to show Artem
 
 One block, before any link: the version; the scope as a list of `FEAT-N` and titles; each gate part
-(0 to 3) green or red with one line why; the proposed known issues, already in the one line the plan
+(0 to 3) green, red or not read yet with one line why; the nightly line, marked "read, not gating"; the proposed known issues, already in the one line the plan
 command will carry. Then the question: go to plan, or not.
+
+## Before the plan
+
+Put these to Artem with the gate block, each in one line, before the plan link:
+
+- **Open questions he has not answered for this release** (`workflows.md` § Open), without a proposed
+  answer: whether Denis keeps a hand deploy of the mobile BFF beside the `mobile` family the plan and
+  apply deploy over it; whether this release needs the `--long` stand scenarios, which CI never runs;
+  what earlier QA passes mean for this build (Part 1).
+- **The runners**: what is running or queued on Core's and Surfaces' one runner (`workflows.md`
+  § Commands), and whether Core's nightly window (from 20:00 UTC, up to 6 hours) is near. A queue can
+  cancel a Core dry run or deploy on its wait; propose a time outside it.
+- **The preconditions** (`workflows.md` § Preconditions) only if one is known to be missing.
+
+## Reading the plan
+
+- **The migrations.** Core's migration job has no dry run, so every migration between the version
+  prod runs and this one runs first on prod data during the apply. The version prod runs is the latest
+  `prod/v2.*` tag; with none (prod deployed by hand before CI), ask Artem which version prod runs.
+  List the Core migrations added between that tag and `v<version>` (`gh api
+  repos/maivanov/Contorra-Events-Core/compare/v<prod>...v<version>` and the migration files it touches),
+  one line each, and say they are not rehearsed.
+- **The console** is not previewed and is rebuilt from source at the tag during the apply: say so.
+- **Diffs against the scope**: as `SKILL.md` step 4 says.
