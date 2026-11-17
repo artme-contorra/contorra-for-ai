@@ -6,7 +6,11 @@ Out of scope: the verdict itself — approve / reject / findings routing live in
 
 This step is all reads — no confirmation needed. The writes come at the verdict.
 
-## Posture — why QA is the release gate
+## Two systems, two postures
+
+**2.0.** A `2.0` issue reaches `QA` when its PR merges (Linear's GitHub integration; base § Statuses → ENG flow on 2.0), which is before it runs anywhere. Test builds are cut deliberately, so the issue waits in `QA` until a build carries the merge; the build's QA post names the version and the issues in it. Test on the test stand at that version, not on prod. There is no staging link and no designer hand-off: skip step 3 below, and read "staging" in steps 4-6 as "the test stand". `Done` on 2.0 records that the issue was checked on test; what reaches prod is recorded per release in `FEAT` (`Released`).
+
+**1.0** (the rest of this section): QA is the release gate.
 
 QA validates on staging **before** promotion to prod. There is no middle "ready to promote" status: `QA` → `Done` *is* the promotion, and `Done` means released (base § Statuses → `ENG`; ontology § 4.1). So QA's approve is the release gate — the sign-off that flips the build from staging to prod (delivery-flow § 2: "her sign-off is what flips a build from staging to prod ... without it, the build doesn't promote").
 
@@ -31,12 +35,14 @@ Show count + one line per entry: `ENG-N — title — assignee (dev) — Type la
 
 `get_issue ENG-N` and `list_comments issueId:"ENG-N"`. From these, pin down:
 
-- **Staging link** — from the dev's (or designer's) hand-off @-mention comment. If absent, ask in a comment / Slack — **don't test blind.**
+- **Where to test.** 1.0: the staging link from the dev's (or designer's) hand-off @-mention comment. 2.0: the test build that carries the merge (its version, from the build's QA post). If neither is clear, ask in a comment / Slack. **Don't test blind.**
 - **What changed** — the issue title + description (minimal for in-Project issues; context lives in the Project) and the hand-off comment. For an in-Project issue, the Project description carries the fuller "what / why".
 - **Type label** — `bug` / `feature` / `chore` / `tech-debt` (base § Labels). A `bug` issue means "verify the fix + that it didn't regress nearby"; a `feature` means "exercise the new flow end-to-end".
 - **`Design approved` state on UI issues** — see step 3.
 
-### 3. Check the `Design approved` gate on UI issues
+### 3. Check the `Design approved` gate on UI issues (1.0)
+
+On a 2.0 issue skip this step: 2.0 has no `Design Review` in `ENG`.
 
 If the issue carries the `UI` label, it should already have the `Design approved` marker — the designer passes it on `Design Review` → `QA` before it reaches QA (ontology § 4.1; base Invariant 4). Confirm `Design approved` is present.
 
@@ -66,7 +72,7 @@ Summarise findings in chat — pass / fail per planned case — and move to `qa-
 
 ## Notes
 
-- **Don't test blind.** No staging link, no test. Ask the dev (the assignee) in a comment / Slack first.
+- **Don't test blind.** No staging link (1.0) or build version (2.0), no test. Ask the dev (the assignee) in a comment / Slack first.
 - **QA is per-task today.** One issue, one full pass — not batch sampling (delivery-flow § 7 step 0). Don't approve a batch on a spot-check; that's the Step-1+ posture, not now.
 - **Tester, not owner.** The assignee is the dev throughout. QA never self-assigns and never appears as assignee on the issue (Invariant 1).
 - **Tracker language is English** (base Invariant 5) — any comment you post here (e.g., flagging a missing `Design approved`) is in English, even if the chat around it is Russian.

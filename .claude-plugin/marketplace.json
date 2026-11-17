@@ -1,6 +1,6 @@
 {
   "name": "contorra-for-ai",
-  "description": "Contorra internal plugins for AI-assisted work: Events tracker roles (PM / dev / designer / QA) and shared base.",
+  "description": "Contorra internal plugins for AI-assisted work: Events tracker roles (PM / dev / designer / QA) and shared base, plus Events 2.0 test builds and releases.",
   "owner": {
     "name": "Artem Kononov",
     "email": "ak@contorra.com"
@@ -24,17 +24,22 @@
     {
       "name": "events-tracker-dev",
       "source": "./events-tracker-dev",
-      "description": "Developer role for the Events tracker — pick up Impl Issues, walk statuses to staging, hand off to Design Review / QA, respond to bounces, review designs for implementability."
+      "description": "Developer role for the Events tracker — pick up Impl Issues; on 1.0 walk statuses to staging and hand off to Design Review / QA, on 2.0 leave the moves to Linear's GitHub integration; respond to bounces, review designs for implementability."
     },
     {
       "name": "events-tracker-qa",
       "source": "./events-tracker-qa",
-      "description": "QA role for the Events tracker — pick up Impl Issues in QA on staging, approve to Done (release gate) or reject with checklist, file sub-issue bugs."
+      "description": "QA role for the Events tracker — pick up Impl Issues in QA, test on staging (1.0) or the test stand (2.0), approve to Done (released to prod on 1.0, checked on test on 2.0) or reject with checklist, file sub-issue bugs."
     },
     {
       "name": "events-tracker-public",
       "source": "./events-tracker-public",
       "description": "Stakeholder-facing Events tracker access for people outside the dev team — read ENG + DES read-only, file requests into ENG Triage. Standalone; does not use events-tracker-shared."
+    },
+    {
+      "name": "events-release",
+      "source": "./events-release",
+      "description": "Test builds and releases of Events 2.0: cut a test build through CI and draft the QA post; take a checked build to prod with Artem starting the plan and apply, then mark FEAT features Released and draft the team post. Depends on events-tracker-shared."
     }
   ]
 }

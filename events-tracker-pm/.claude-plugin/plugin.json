@@ -1,6 +1,6 @@
 {
   "name": "events-tracker-pm",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "PM / tracker-owner role for the Events tracker (Linear ENG + DES, parking into REQ). Project pair creation, Triage sweep and parking, cycle planning. Depends on events-tracker-shared for the base ontology.",
   "author": {
     "name": "Artem Kononov",

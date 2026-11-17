@@ -1,5 +1,7 @@
 # Handing off after staging
 
+**1.0 only.** A 2.0 issue has no `In Staging` and no hand-off: Linear's GitHub integration moves it to `QA` on merge, and QA picks it up when a test build carries it (base § Statuses → ENG flow on 2.0).
+
 Recipe for the dev's hand-off: an own Impl Issue has reached `ENG` `In Staging` (merged + deployed to staging), route it to the right review phase — `Design Review` if it carries the `UI` label, else `QA` — with an @-mention to the reviewer. Loaded on demand from `events-tracker-dev` → `SKILL.md` → § References pointer. Entry-point trigger: "выложил на стейджинг", "отдай на ревью / QA", "hand off ENG-N", "it's on staging, who reviews".
 
 Out of scope: getting to `In Staging` (you walk `In Progress` → `In Review` → `In Staging` manually until GitHub integration; the merge+deploy itself is off-tracker). The reviewers' decisions (designer / QA skills). Handling a bounce that comes back (see `responding-to-bounce.md`).

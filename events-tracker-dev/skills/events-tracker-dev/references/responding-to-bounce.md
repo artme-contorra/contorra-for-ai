@@ -48,7 +48,9 @@ Track which items are resolved so the re-hand-off comment can speak to each one.
 
 ### 4. Walk forward and hand off, skipping cleared phases
 
-Once merged + deployed to staging, transition back to `In Staging` (manual until GitHub integration; base § Statuses → `ENG`):
+**On a 2.0 issue** there is nothing to walk: open the fix's PR naming the `ENG-N`, and Linear's GitHub integration moves the issue to `In Review` and, on merge, to `QA`. QA rechecks it when a test build carries the fix (base § Statuses → ENG flow on 2.0). Reply to the checklist in a comment so QA knows what each fix was; skip the rest of this step.
+
+**On a 1.0 issue:** once merged + deployed to staging, transition back to `In Staging` (manual until GitHub integration; base § Statuses → `ENG`):
 
 ```
 mcp__linear-server__save_issue

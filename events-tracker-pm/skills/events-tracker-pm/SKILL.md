@@ -56,6 +56,7 @@ PM / tracker-owner role for the Events tracker. This skill defines the PM-specif
 
 - **Doesn't write code, do design work, or do QA work.** The skill orchestrates the tracker; it doesn't deliver the work the tracker holds.
 - **Doesn't transition issues across review boundaries on behalf of reviewers.** A `Design Review` → `QA` transition is the designer's call; a `QA` → `Done` is QA's. PM can comment, nudge in Slack, or reassign-the-owner if the actual owner changed — but doesn't approve on someone else's behalf.
+- **Doesn't make the integration's moves on a 2.0 issue.** `In Review` and `QA` on 2.0 are Linear's GitHub integration's (base § Statuses → ENG flow on 2.0). A 2.0 issue that did not move is a signal to read (the PR did not name it, or a repository is not connected), not a status to set by hand.
 - **Doesn't reassign on handoff.** Assignee = owner (Invariant 1 in `events-tracker-base`). PM only changes assignee when ownership genuinely moves (e.g., re-routing an Impl Issue from one dev to the other).
 
 ### Confirmation rules

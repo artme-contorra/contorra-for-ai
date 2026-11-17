@@ -20,9 +20,11 @@ description: >
   Developer role wrapper for the Events tracker in Linear. Own work lives in
   `ENG` (Impl Issues, assignee = you); review duty lives in `DES` (Design
   Issues sitting in `In Dev Review`). Use whenever doing dev-side tracker work:
-  picking up an assigned Impl Issue from `Todo`, walking it `In Progress` →
-  `In Review` → `In Staging`, handing off to `Design Review` or `QA` after
-  staging, responding to a Design Review / QA bounce, or reviewing a designer's
+  picking up an assigned Impl Issue from `Todo`, walking a 1.0 issue
+  `In Progress` → `In Review` → `In Staging` and handing it off to
+  `Design Review` or `QA` after staging (a 2.0 issue is moved by Linear's
+  GitHub integration instead), responding to a Design Review / QA bounce, or
+  reviewing a designer's
   macro for implementability — and for any `ENG-N` / `DES-N` reference
   handled from the dev seat. Triggers even when Linear isn't named explicitly.
   Pairs with the `events-tracker-base` skill (from the `events-tracker-shared`
@@ -46,8 +48,9 @@ The consumer is one of the team's web devs (there are two — never assume which
 ### What the dev does
 
 - **Picks up an assigned Impl Issue** from `ENG` `Todo` (active cycle) into `In Progress`. Pre-flight: any blocking Design Issue is `Done`, and the Project context is understood.
-- **Walks own `ENG` statuses** `In Progress` → `In Review` → `In Staging` (manual until the GitHub integration is turned on; see § Identity resolution). Assignee stays the dev throughout.
-- **Hands off after `In Staging`**: `UI` label present → `Design Review` + @-mention the designer (with the staging link); no `UI` → `QA` + @-mention QA.
+- **On a 1.0 issue, walks own `ENG` statuses** `In Progress` → `In Review` → `In Staging` by hand (see § Identity resolution). Assignee stays the dev throughout.
+- **On a 1.0 issue, hands off after `In Staging`**: `UI` label present → `Design Review` + @-mention the designer (with the staging link); no `UI` → `QA` + @-mention QA.
+- **On a 2.0 issue, moves only `Todo` → `In Progress`.** From there Linear's GitHub integration moves it: PR opened → `In Review`, PR merged → `QA` (base § Statuses → ENG flow on 2.0). The dev's part is that the PR names the `ENG-N`. There is no `In Staging`, no `Design Review` and no hand-off comment; QA picks the issue up when a test build carries the merge.
 - **Responds to a bounce**: an own Impl Issue sent back to `In Progress` from `Design Review` or `QA` — parse the reviewer's checklist, fix, walk forward again, hand off skipping already-cleared phases.
 - **Reviews a designer's macro** for implementability on `DES` `In Dev Review` (the designer @-mentioned the dev): approve (`Dev approved` label + `Done`) or reject (checklist comment + `In Progress` + @-mention designer).
 - **May dispute the `UI` label** on an own Impl Issue via comment + label removal (base Invariant 3) when the change doesn't actually touch the UI.
@@ -55,7 +58,8 @@ The consumer is one of the team's web devs (there are two — never assume which
 
 ### What the dev does NOT do
 
-- **Doesn't transition an own Impl Issue to `Done`.** `Done` on `ENG` is **QA's** call after the `QA` phase. The dev's hand-off ceiling is `Design Review` / `QA`.
+- **Doesn't transition an own Impl Issue to `Done`.** `Done` on `ENG` is **QA's** call after the `QA` phase. The dev's hand-off ceiling is `Design Review` / `QA` on 1.0.
+- **Doesn't make the integration's moves on a 2.0 issue.** `In Review` and `QA` on 2.0 are Linear's GitHub integration's. If an issue did not move (the PR did not name it, or the repository is not connected yet), say so; don't move it by hand.
 - **Doesn't set `Design approved` (designer's) or `QA approved` (QA's).** The only marker the dev sets is `Dev approved`, and only on `DES` `In Dev Review` → `Done`.
 - **Doesn't make a reviewer's call.** `Design Review` → `QA` is the designer's; `QA` → `Done` is QA's. The dev moves work *into* a review state and addresses bounces; it doesn't approve on a reviewer's behalf.
 - **Doesn't reassign on handoff.** Assignee = owner (Invariant 1 in `events-tracker-base`). On an own Impl Issue the dev stays assignee to `Done`; on a Design Issue under review the assignee is the designer and stays the designer — the dev reviews via comment + @-mention, never reassigns.
@@ -76,7 +80,7 @@ The consumer is one of the team's web devs (there are two — never assume which
 Load on demand — combined base (this skill + `events-tracker-base`) covers the rest of the dev's needs.
 
 - `references/picking-up-impl-issue.md` — load when starting an assigned Impl Issue: `ENG` `Todo` (active cycle) → `In Progress`, after pre-flight checks.
-- `references/handoff-after-staging.md` — load when an own Impl Issue has reached `In Staging` and needs routing to a review phase: `Design Review` (if `UI`) or `QA`.
+- `references/handoff-after-staging.md`: 1.0 only. Load when an own Impl Issue has reached `In Staging` and needs routing to a review phase: `Design Review` (if `UI`) or `QA`.
 - `references/dev-review-of-design.md` — load when a Design Issue in `DES` `In Dev Review` needs the dev's implementability sign-off: approve to `Done` or reject to `In Progress`.
 - `references/responding-to-bounce.md` — load when an own Impl Issue was bounced back to `In Progress` from `Design Review` / `QA`: fix, walk forward, hand off skipping cleared phases.
 
@@ -86,5 +90,5 @@ This skill runs on the dev's own machine, not in a shared management workspace �
 
 - **Own issues** — filter with `assignee: "me"`; the dev running the skill is the assignee.
 - **Other people** (designer, QA, the other dev) — resolve `displayName` via `list_users name:"<person name>"` at execution time, or read a Project's `lead` (`get_project`) for the responsible dev. Never hardcode a name or `displayName`; the roster drifts.
-- **GitHub / PR conventions** — your team's branch model, PR self-test checklist, and UI-PR screenshot + designer @-mention convention live in your own repo / PR-conventions doc, not here. Tracker transitions are manual until the Linear↔GitHub integration is enabled; once it is, branch → `In Progress`, PR ready → `In Review`, merge → `In Staging` become automatic (base § Statuses → `ENG`).
+- **GitHub / PR conventions**: your team's branch model, PR self-test checklist, and UI-PR screenshot + designer @-mention convention live in your own repo / PR-conventions doc, not here. On 1.0, as these plugins describe it, tracker transitions are manual. On 2.0 the Linear↔GitHub integration moves the issue (PR opened → `In Review`, merged → `QA`); name the `ENG-N` in the branch, title or description so it can (base § Statuses → ENG flow on 2.0).
 - **`events-tracker-base`** — the only sibling skill this one depends on: catalog, ontology, invariants, MCP-tool guide. Don't restate it here.

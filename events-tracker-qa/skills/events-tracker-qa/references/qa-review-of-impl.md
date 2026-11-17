@@ -1,29 +1,31 @@
 # QA verdict on an Impl Issue
 
-Recipe for QA's verdict: after testing a `QA` issue on staging (`qa-pickup-from-staging.md`), approve to `Done` or reject to `In Progress`. Loaded on demand from `events-tracker-qa` → `SKILL.md` → § References pointer. Entry-point trigger: "проверил, всё ок, закрывай ENG-N", "approve and release", "qa reject ENG-N", "верни на доработку".
+Recipe for QA's verdict: after testing a `QA` issue (staging on 1.0, the test stand on 2.0; `qa-pickup-from-staging.md`), approve to `Done` or reject to `In Progress`. Loaded on demand from `events-tracker-qa` → `SKILL.md` → § References pointer. Entry-point trigger: "проверил, всё ок, закрывай ENG-N", "approve and release", "qa reject ENG-N", "верни на доработку".
 
 Out of scope: the test pass itself (see `qa-pickup-from-staging.md`). Issues in any status other than `QA` — QA only touches an Impl Issue on this call (`SKILL.md` → § Role scope → What QA does NOT do). `DES` and the dev's / designer's own approvals.
 
-This is QA's only write path on the board. Confirm once for a reject batch. **Confirm the `Done` transition (approve) per call, every time** — it releases to prod.
+This is QA's only write path on the board. Confirm once for a reject batch. **Confirm the `Done` transition (approve) per call, every time.**
 
-## Why this is the release gate
+## What `Done` means
 
-QA's approve sets `QA approved` and transitions `QA` → `Done`. `Done` means **released to prod** — there is no intermediate "ready to promote" status (base § Statuses → `ENG`; ontology § 4.1). The promotion itself happens outside the tracker (deploy / flip from staging); the `Done` transition records it. So the approve is a real release decision, not a stamp (delivery-flow § 2) — which is why it carries per-call confirmation.
+**On 2.0** `Done` means QA checked the issue on test, at the build that carries it. It is not a release: a release promotes a checked test build to prod and is recorded on the `FEAT` features (`Released`) and the release tags `prod/v2.<stage>.<build>` (a `v2.*` tag alone is a test build). Name the version you tested in the approve comment. On a reject, the fix's PR moves the issue forward again through Linear's GitHub integration; nobody walks it back to `QA` by hand (base § Statuses → ENG flow on 2.0).
+
+**On 1.0** QA's approve is the release gate. QA's approve sets `QA approved` and transitions `QA` → `Done`. `Done` means **released to prod**: there is no intermediate "ready to promote" status (base § Statuses → `ENG`; ontology § 4.1). The promotion itself happens outside the tracker (deploy / flip from staging); the `Done` transition records it. So the approve is a real release decision, not a stamp (delivery-flow § 2), which is why it carries per-call confirmation.
 
 QA does not own the issue. The assignee is the dev, all the way to `Done` (Invariant 1). Approve or reject, the assignee never changes.
 
 ## 1a. Approve → `Done`
 
-If staging holds up across the planned pass (`qa-pickup-from-staging.md` step 4), approve. This sets the `QA approved` marker and releases to prod.
+If the pass holds up (`qa-pickup-from-staging.md` step 4), approve. This sets the `QA approved` marker; on 1.0 it releases to prod, on 2.0 it records the check on test.
 
-The dev to thank / notify is the **assignee** — already on the issue from the pickup's `get_issue` (no lookup needed). Confirm the release explicitly (this is the `Done` call), then:
+The dev to thank / notify is the **assignee**, already on the issue from the pickup's `get_issue` (no lookup needed). Confirm the `Done` call explicitly, then:
 
 ```
 # 1. Approve comment
 mcp__linear-server__save_comment
   issueId: "ENG-N"
   body: |
-    QA passed on staging — <one line: flows exercised, all green>. Approving for release.
+    QA passed on <staging (1.0) | test, 2.x.y (2.0)>: <one line: flows exercised, all green>. <1.0 only: Approving for release.>
 
 # 2. Set QA approved label + transition to Done
 mcp__linear-server__save_issue
@@ -36,20 +38,20 @@ mcp__linear-server__save_issue
 
 ## 1b. Reject → `In Progress`
 
-If staging fails the pass, reject with a concrete checklist and bounce back to the dev.
+If the pass fails, reject with a concrete checklist and bounce back to the dev.
 
 ```
 # 1. Checklist comment, @-mention the dev (the assignee)
 mcp__linear-server__save_comment
   issueId: "ENG-N"
   body: |
-    @<dev displayName> QA — issues found on staging, needs another pass:
+    @<dev displayName> QA: issues found on <staging (1.0) | test, 2.x.y (2.0)>, needs another pass:
 
     - [ ] <finding 1 — what, where, expected vs. actual, repro>
     - [ ] <finding 2>
     - [ ] <finding 3>
 
-    Staging: <link tested>
+    Tested: <staging link (1.0) | build version (2.0)>
 
 # 2. Transition back to In Progress
 mcp__linear-server__save_issue
@@ -69,7 +71,7 @@ The `<dev displayName>` is the assignee — @-mention by `displayName` (resolve 
 mcp__linear-server__save_issue
   team: "Events Engineering"
   title: "<the finding — standalone-readable>"
-  description: "<repro / expected vs. actual / staging reference>"
+  description: "<repro / expected vs. actual / where: staging link (1.0) or build version (2.0)>"
   labels: ["bug", "<1.0 or 2.0>"]
 ```
 
@@ -80,12 +82,12 @@ Add the `System` label for the system the finding is in (`1.0` or `2.0`, base §
 
 ## 3. Echo result in chat
 
-- `ENG-N` → `Done` (approved, `QA approved` set, **released to prod**) **or** → `In Progress` (rejected, checklist posted, dev @-mentioned).
+- `ENG-N` → `Done` (approved, `QA approved` set; on 1.0 **released to prod**, on 2.0 checked on test at the named version) **or** → `In Progress` (rejected, checklist posted, dev @-mentioned).
 - Any out-of-scope findings filed to `Triage` (their `ENG-N`); in the rare sub-issue case, a note that the parent stays in `QA` until it closes.
 
 ## Notes
 
-- **Approve = released to prod.** The `Done` transition is the release gate, not a workflow nicety. Per-call confirmation, always (`SKILL.md` → § Confirmation rules). Never batch it.
+- **On 1.0, approve = released to prod.** The `Done` transition is the release gate, not a workflow nicety. On 2.0 it is the check on test, and the release is recorded in `FEAT`. Per-call confirmation, always (`SKILL.md` → § Confirmation rules). Never batch it.
 - **`QA approved` is QA's label; `Design approved` and `Dev approved` are not.** `Design approved` is the designer's (on `Design Review`); `Dev approved` is the dev's (on `DES` `In Dev Review`). On `ENG`, QA sets only `QA approved` (base § Labels).
 - **Marker labels survive bounces.** `QA approved` (and any `Design approved` already present) persist across a reopen; the next pass skips the cleared phase unless the relevant surface actually changed (Invariant 4). QA doesn't re-clear them.
 - **Never reassign on either branch.** Approve or reject, the assignee stays the dev (Invariant 1). The @-mention + status change is the signal.

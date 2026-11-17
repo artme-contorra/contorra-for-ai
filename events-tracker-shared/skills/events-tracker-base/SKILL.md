@@ -93,7 +93,7 @@ This section is the self-contained operating canon for the ontology — no exter
 
 ### Statuses
 
-**`ENG`** — 11-status set:
+**`ENG`**: 11-status set. `ENG` carries issues for both systems (the `System` label, § Labels), and the two walk it differently: see § ENG flow on 2.0 below the table. Where a meaning differs, the row says which system.
 
 | Name | Type | Meaning |
 |---|---|---|
@@ -101,15 +101,34 @@ This section is the self-contained operating canon for the ontology — no exter
 | `Backlog` | backlog | Accepted; not scheduled into a cycle. |
 | `Todo` | unstarted | Committed in current cycle; not started. |
 | `In Progress` | started | Branch / draft PR open, dev working. |
-| `In Review` | started | PR open, awaiting code review. |
-| `In Staging` | started | Merged; deployed to staging. Awaiting designer / QA. |
-| `Design Review` | started | Designer reviewing impl on staging. |
-| `QA` | started | QA testing impl on staging. |
-| `Done` | completed | Released to prod. |
+| `In Review` | started | PR open, awaiting code review. On 2.0, set by Linear's GitHub integration when the PR opens. |
+| `In Staging` | started | 1.0: merged; deployed to staging. Awaiting designer / QA. Not used on 2.0. |
+| `Design Review` | started | 1.0: designer reviewing impl on staging. Not used on 2.0. |
+| `QA` | started | 1.0: QA testing impl on staging. 2.0: merged (set by the integration); QA checks it on test once a test build carries it. |
+| `Done` | completed | 1.0: released to prod. 2.0: QA checked it on test. What is on prod is read from `FEAT` `Released` and the release tags `prod/v2.<stage>.<build>`, not from `Done`. |
 | `Canceled` | canceled | Won't ship. |
 | `Duplicate` | duplicate | Same as another issue. |
 
-GitHub integration (branch → `In Progress`, ready → `In Review`, merge → `In Staging`) is deferred — transitions are manual until turned on.
+On 1.0, as these plugins describe it, transitions are manual: the dev walks `In Progress` → `In Review` → `In Staging` and hands off to `Design Review` or `QA` by hand.
+
+#### ENG flow on 2.0
+
+One flow for every `2.0` issue. Linear's GitHub integration is connected to the 2.0 repositories (Core, Surfaces, Proto) and moves the issue; nobody else does, and no agent does:
+
+| Step | Status | Moved by |
+|---|---|---|
+| Work starts | `Todo` → `In Progress` | the dev |
+| A PR that names the issue opens | → `In Review` | Linear's GitHub integration |
+| That PR merges | → `QA` | Linear's GitHub integration |
+| A test build carries the merge; QA checks it on test | `QA` → `Done` | QA, by hand, after checking |
+| QA finds an in-scope problem | `QA` → `In Progress` | QA; the fix's PR then moves it forward again through the integration |
+
+- **A PR names its `ENG-N`** (branch name, title or description) so the integration can find the issue. A PR that names none moves nothing.
+- **No agent moves `In Review` or `QA` on a 2.0 issue**, and no agent moves a 2.0 issue to `Done` on its own judgement. If an issue did not move (the PR did not name it, or the integration is not connected for that repository yet), say so to the issue's owner; do not move it by hand in its place.
+- **`QA` is a queue, not "on the stand".** Test builds are cut deliberately, not on every merge, so a merged issue waits in `QA` until a build carries it. The build's QA post names the version and the issues now in `QA`; that is when QA picks them up.
+- **`Done` is not a release.** A 2.0 release is a test build QA has checked, promoted unchanged; it is recorded on the `FEAT` features (`Released`) and in the release tags `prod/v2.<stage>.<build>` on Core and Surfaces. A `v2.<stage>.<build>` tag alone is a test build, not a release. Linear Releases are not used (they need the Business plan).
+- **No `In Staging`, no `Design Review` on 2.0.** The design review of 2.0 screens lives in the repository, not in `ENG` (`D-035`); the `UI` label routes nothing on a 2.0 issue.
+- Linear's settings (the integration, its rules) are the tracker owner's to change.
 
 **`DES`** — 7-status set (no `Triage`, no PR / staging / QA gates):
 
@@ -145,7 +164,7 @@ GitHub integration (branch → `In Progress`, ready → `In Review`, merge → `
 | `Ready for QA` | started | opened: the test stand runs a build that shows it | the iteration procedure; the sync when a fix reaches the stand |
 | `QA failed` | started | QA found an in-scope problem, written in a comment | QA |
 | `QA passed` | started | QA accepted it | QA |
-| `Released` | completed | in production | the release procedure |
+| `Released` | completed | in production | the `releasing` skill (`events-release` plugin), after the prod apply of the build that carries it |
 | `Not porting` | canceled | a 1.0 behaviour 2.0 does not carry; the reason in the description | Artem |
 | `Duplicate` | duplicate | Linear's own: same as another feature | anyone |
 
@@ -157,8 +176,8 @@ GitHub integration (branch → `In Progress`, ready → `In Review`, merge → `
 |---|---|---|---|
 | `bug` / `feature` / `chore` / `tech-debt` | lowercase | PM — at create (own issues) or at Triage sweep (incoming) | Mandatory exactly-one. Linear **label group** `Type` enforces mutual exclusion natively. |
 | `1.0` / `2.0` | as written | Reporter if they know it, else PM at Triage sweep; PM at create | Mandatory exactly-one, label group `System`: which Events system the issue is about (1.0, the current Firebase product; 2.0, the new system). An issue touching both takes the system where it is fixed. Linear cannot require a label; the sweep does not let an issue leave `Triage` without `System` and `Type` (D-043). |
-| `UI` | all caps | PM at create | Impl Issue changes the UI and needs a `Design Review` pass. Assignee can dispute via comment + label removal. |
-| `Design approved` | Title case | Designer | Set on `Design Review` → `QA` approve. Survives bounces — a later QA reject doesn't undo it. |
+| `UI` | all caps | PM at create | Impl Issue changes the UI and needs a `Design Review` pass (1.0; on 2.0 it routes nothing, § ENG flow on 2.0). Assignee can dispute via comment + label removal. |
+| `Design approved` | Title case | Designer | Set on `Design Review` → `QA` approve (1.0). Survives bounces: a later QA reject doesn't undo it. |
 | `QA approved` | Title case | QA | Set on `QA` → `Done` approve. Survives bounces. |
 
 Area labels are **not pre-created**. Add organically if filtering pressure shows up.
@@ -210,12 +229,16 @@ These hold across the entire tracker. Violations break downstream conventions.
 1. **No reassignment on review handoff.** Assignee = owner (the actor who carries the issue to `Done`), never the reviewer. Design Issue assignee = designer all the way; Impl Issue assignee = dev all the way. Reviewers communicate via comment + @-mention; status transitions are made by whoever's call it is (owner moves work into a review state; reviewer approves / rejects). Rationale: "what am I on the hook for" dashboards must answer *who delivers*, not *who looked at it most recently*.
 2. **Triage routing: `ENG`, and `FEAT` apart.** All non-PM-created `ENG` issues land in `Triage`. PM sweep (daily or as items arrive) sets priority, type label, `System` label, project, assignee, then transitions to `Backlog` (or `Todo` + cycle if pre-committed). PM-created issues skip `Triage`. `DES` has no `Triage` — ad-hoc design requests come via Slack and the PM creates the issue directly in `Backlog`. A Triage item the team deliberately does not take is **moved to `REQ` as `Parked`** with a return condition; it is never left in `ENG` `Backlog`, which holds only work the team intends to do. `ENG` `Triage` is the one way in for both systems: a finding on 2.0 is an `ENG` issue labelled `2.0` and related to its `FEAT-N`; `FEAT` holds features only and its `Triage` is not used (D-043).
 3. **`UI` label semantics.** PM sets `UI` at creation when the Impl Issue changes the user interface and needs a `Design Review` pass. The assignee (dev) can dispute via comment + label removal; PM should not silently re-set it. Lives outside the `Type` group.
-4. **Marker labels persist across bounces.** `Design approved`, `QA approved`, `Dev approved` survive when an issue bounces back to `In Progress` from a later review. The next `In Staging` skips the already-cleared phase unless the relevant surface actually changed again. Re-entry doesn't redo passed gates.
+4. **Marker labels persist across bounces.** `Design approved`, `QA approved`, `Dev approved` survive when an issue bounces back to `In Progress` from a later review. On 1.0 the next `In Staging` skips the already-cleared phase unless the relevant surface actually changed again. Re-entry doesn't redo passed gates.
 5. **Tracker language is English.** All tracker content — titles, descriptions, comments — is written in English, regardless of the conversation language around it. The tracker is the English-language canonical record; Slack and meetings can be Russian. Items that arrive in Russian (e.g., Triage submissions) get translated when processed.
 6. **`FEAT` statuses have owners.** QA moves `Ready for QA` to `QA passed` or `QA failed` and files findings into `ENG` `Triage`; Artem
    sets `Unstaged` and `Planned` (the stage), `Not porting`, and closes an opened feature back to `In development`;
    `In development`, `Ready for QA` and `Released`, the `iteration` label and every mark are an agent's at a sync
-   point or in the iteration and release procedures; `Duplicate` is anyone's. A role plugin never sets a mark by hand.
+   point or in the iteration and release procedures (`Released`: the `releasing` skill, after the prod apply);
+   `Duplicate` is anyone's. A role plugin never sets a mark by hand.
+7. **2.0 statuses on `ENG` follow the code.** Linear's GitHub integration moves a `2.0` issue to `In Review` and
+   `QA`; QA moves it to `Done` after checking it on test. No agent makes the integration's moves in its place
+   (§ ENG flow on 2.0).
 
 ## MCP-tool guide
 
