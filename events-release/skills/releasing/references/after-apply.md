@@ -7,7 +7,11 @@ alone is the test build).
 ## 1. `FEAT` features to `Released`
 
 - The list is the scope from `gate.md`: the features this version carries that were not `Released`.
-- Show Artem the list (`FEAT-N` and title) and ask once for a yes to the whole list. Then, per feature:
+- Open, Artem's: whether `Released` waits for the invitations to go out, and whether a feature shipped
+  under a known issue (not `QA passed`) moves too. Until he has ruled, ask both in one line each with
+  the list, without proposing an answer, and move only what he says.
+- Show Artem the list (`FEAT-N`, title, its current status) and ask once for a yes to the whole list.
+  Then, per feature:
 
 ```
 mcp__linear-server__save_issue

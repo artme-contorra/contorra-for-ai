@@ -11,8 +11,11 @@ Loaded from `cutting-a-test-build` → `SKILL.md`. Workflow names, inputs and co
   `gh pr list --repo <repo> --base main --state merged --search "merged:>=<tag date>" --json number,title,mergedAt,url`,
   cross-checked against `git log <tag>..origin/main` in a fresh clone or `gh api repos/<repo>/compare/<tag>...main`.
 - For each PR, the `ENG-N` it names (branch, title or description) and that issue's state
-  (`get_issue`). On 2.0 a merged issue should be in `QA`; one that is not is a finding for the
-  issue's owner (the PR did not name it, or the integration is not connected for that repository).
+  (`get_issue`). Read the description with `gh pr view <n> --repo <repo> --json title,body,headRefName`:
+  the manifest's `merged:` reads only the branch and title, and Core's branches (`worktree/...`) and
+  titles seldom carry a key (workflows.md § Outputs). On 2.0 a merged issue should be in `QA`; one that
+  is not is a finding for the issue's owner (the PR did not name it, or the integration is not
+  connected for that repository).
 - Proto: list what merged there too, but Proto is carried by the pin, not built.
 
 Say what the build is for. Typical answers: "the fixes for ENG-231 and ENG-235 that QA is waiting on";
@@ -36,31 +39,39 @@ wait". The last one is a reason not to build.
 
 ## 3. Dispatch and wait
 
-- **After a failed build: retry, or skip.** Read the previous test-build run (`gh run list`, then
-  `gh run view <id> --json conclusion,jobs`). If it ended untagged (its `Tag & manifest` job failed
-  or never ran, and no `v<version>` tag exists for it), decide by whether a `main` moved since:
-  - **Neither Core's nor Surfaces' `main` moved:** retry with the same inputs (the same `stage`, the
-    same `skipped`, or none). The build takes the same number again and deploys the images already
-    pushed as that version, without rebuilding them. Core's build gets the same rule in Core#64; until
-    that is on Core's `main`, a retry fails in `Core → test` whenever the failed run had pushed Core's
-    images: say so, and the build waits for a new commit on Core's `main`.
+- **After a failed build: classify, then retry or skip.** Read the previous test-build run
+  (`gh run list`, then `gh run view <id> --json conclusion,jobs`). If it ended untagged (its
+  `Tag & manifest` job failed or never ran, and no `v<version>` tag exists for it), first classify the
+  failure as § 4 says: machine or code. Then:
+  - **A code failure** (a check that fails again on the same commits, as 2.2.2's digest check did) is
+    never retried, even while neither `main` moved: say so, and the build waits for the fix PR on
+    `main`. If the run pushed an image of its version, that version is spent (below).
+  - **A machine failure, and neither Core's nor Surfaces' `main` moved:** retry once with the same
+    inputs (the same `stage`, the same `skipped`, or none). The build takes the same number again and
+    deploys the images already pushed as that version, without rebuilding them (both repositories,
+    the single-manifest check included: workflows.md § Images).
   - **A `main` moved, and the failed run pushed an image of its version:** that version is spent. Pass
     it, with every version spent before it since the last tag, as `skipped`, space-separated
     (`-f skipped="2.2.4 2.2.5"`). A repository that did not move and had pushed an image of the spent
     version cannot build until its `main` gets a new commit: say which.
+  - When unsure which kind it is, say so and ask Artem; do not dispatch.
   - The run's "Not tagged" note says the same and names the value; it is on the run page only, so ask
     Artem to read it out, or derive the version: one past the highest `v2.<stage>.*` tag, or one past
     the highest `skipped` the run was given. Whether an image was pushed: the build job of that family
     succeeded (Core: `Core → test`'s Core run; Surfaces: `Surfaces → test / <family>`).
   - Compose checks `skipped` before anything deploys: a version that is not a gap from the next
     untagged number on stops the run with nothing deployed.
-- Dispatch the test-build workflow from `main` of Surfaces (workflows.md § Commands). Pass `stage`
-  only when Artem named a new one, `skipped` only as above. The run is titled
-  `Test build · current stage` (or `· stage <n>`).
+- Dispatch the test-build workflow from `main` of Surfaces (workflows.md § Commands), always with
+  `--ref main`: from any other ref the run skips everything and reports no error. Pass `stage` only
+  when Artem named a new one, `skipped` only as above. The run is titled `Test build · current stage`
+  (or `· stage <n>`).
+- Before the dispatch, look at what is queued on each repository's one runner (workflows.md § One
+  runner per repository). A long queue on Core, or Core's nightly window (from 20:00 UTC), can cancel
+  `Core → test` on its wait: say so and propose another time rather than dispatching into it.
 - Find the run it started (`gh run list`, the newest `workflow_dispatch` run created after the
-  dispatch) and give its URL.
-- Watch it to the end (`gh run watch --exit-status`). The run deploys to the shared test stand; tell
-  the person that test is changing while it runs, since QA may be on it.
+  dispatch) and give its URL to the person who asked.
+- Watch it to the end (`gh run watch --exit-status`). No notice to QA before or during the run: QA is
+  told about a build by Artem, from the post drafted after it (§ 4 and `qa-post.md`).
 - Do not start a second test build while one is running.
 
 ## 4. Reading the result
@@ -71,16 +82,30 @@ wait". The last one is a reason not to build.
 - **Red.** `gh run view <id> --json conclusion,jobs`, the run's `::error::` annotations, then
   `--log-failed`. Name the job (workflows.md § Runs and jobs): `Compose` (the reads of § 2 found
   late, the numbering, a `skipped` that is no gap, or "nothing moved"), `Core → test` (a separate Core
-  run, `Deploy all → test · <version>`: follow its URL in the job's log), `Surfaces → test / <family>`,
-  the scenarios, or `Tag & manifest`. Give the first
-  failing line in plain words. A deploy failure leaves test on the previous build or partly updated:
-  say which families moved. A failure before the tagging leaves the version untagged: say so, and whether
-  the next dispatch is a retry with the same inputs or carries it as `skipped` (§ 3).
+  run, `Deploy all → test · <version>`: follow its URL in the job's log and read that run's
+  `--log-failed` too, since a deploy-script failure there is a `FAIL:` line, not an annotation),
+  `Surfaces → test / <family>`, the scenarios, or `Tag & manifest`. Give the first failing line in
+  plain words. A failure before the tagging leaves the version untagged: say so, and whether the next
+  dispatch is a retry with the same inputs or carries it as `skipped` (§ 3).
+- **Which families moved.** A red family job does not mean its family stayed: a deploy replaces the
+  service (and runs Core's migration job) before it checks it, so the service may already run the
+  new build. Read each deploy job's log, red ones included, by the lines in workflows.md § Outputs
+  ("What a red deploy job already changed"), and say per family: moved and confirmed, moved but
+  unconfirmed, or not moved. Test is then mixed (2.2.2 left Core and its migrations on the new build,
+  identity and Surfaces on the previous one). There is no rollback. Draft a stand-status line for
+  Artem (`qa-post.md` § Stand status), so QA knows what the stand runs; he decides whether to send it.
+- **Machine or code.** Classify every red job before deciding the next dispatch:
+  - machine: the runner restarted or lost its network, the registry or GitHub did not answer, a wait
+    timed out in the queue and cancelled the Core run, an authentication or clone failure on the
+    runner. The same commits would pass on a healthy machine.
+  - code: a check in the workflow or the deploy scripts that fails on these commits (a digest that
+    does not match, a form that does not render, a failing scenario). It fails again on a retry.
+  Say which, and why, in one line.
 - **Tagged, scenarios red.** The run is red but the build is tagged and on test: the tagging job
   stops after the tag with "deployed and tagged, but the scenarios on test are ...". The build is not
   fit for QA and cannot be released: say so and do not draft a QA post for it.
-- Never retry a red run blindly. On a test build only: when a job failed on the machine (network, a
-  runner restart), retry once by dispatching again with the same inputs (§ 3), and say so. A red check on the code needs a fix PR and a new
+- Never retry a red run blindly. On a test build only: a machine failure is retried once by
+  dispatching again with the same inputs (§ 3), and said so. A code failure needs a fix PR and a new
   build. Plan, apply and prod runs are never re-run by the agent (workflows.md § Commands).
 
 ## 5. What the build does not do
@@ -88,7 +113,8 @@ wait". The last one is a reason not to build.
 - It moves no `ENG` status: the integration already moved merged 2.0 issues to `QA`, and QA moves them
   on after checking.
 - It moves no `FEAT` status. A feature whose fix this build carries goes `QA failed` → `Ready for QA`
-  at "the sync when a fix reaches the stand" (`events-tracker-base` § Statuses → `FEAT`), which is not
-  this skill. List such features in the QA post draft so Artem sees them; do not move them.
+  at "the sync when a fix reaches the stand" (`events-tracker-base` § Statuses → `FEAT`). Who makes
+  that move in the CI path is not decided: list such features in the QA post draft and ask Artem, in
+  one line, who moves them back to `Ready for QA`. Do not move them.
 - It does not touch prod and does not make the build a release. A release is a later step, on a build
   QA has checked (`releasing`).

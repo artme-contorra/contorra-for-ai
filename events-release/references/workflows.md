@@ -1,6 +1,7 @@
 # The CI workflows behind a test build and a release
 
-As in `maivanov/Contorra-Events-Surfaces` PR #226 (branch `ak/release-workflows`, read at `31a7971ee`).
+As on `main` of `maivanov/Contorra-Events-Surfaces` at `00c2384f0` (the merge of #229, after #226 and
+#228) and of `maivanov/Contorra-Events-Core` at `269b4ed9` (the merge of #73, after #64).
 This file is the one place in the plugin that names them: when a workflow changes a file name, an
 input or an output, correct it here and bump the plugin. The two skills speak of workflows by role
 (test-build, plan, apply) and never by file.
@@ -20,9 +21,9 @@ so. It never falls back to deploying from a laptop.
 
 | Role | Lives in | File | Inputs | Who starts it | What it does |
 |---|---|---|---|---|---|
-| test-build | Surfaces | `.github/workflows/test-build.yml` | `stage` (optional: a new stage only on Artem's word; empty keeps the current one); `skipped` (optional: versions an earlier failed build spent and never tagged, space-separated, e.g. `2.2.4 2.2.5`; checked in compose, before anything deploys) | anyone on the team, or the agent through `cutting-a-test-build` | Composes `main` of Core and Surfaces at dispatch (same Proto pin, green `floor`, or it stops and says which), numbers the build `2.<stage>.<build>`, deploys to test through each repository's `deploy.yml` (Core first, then the Surfaces families; a repository whose `main` did not move since the previous build is carried, not rebuilt), runs the stand scenarios, then tags both repositories `v2.<stage>.<build>` with the build manifest. A build whose scenarios fail is still tagged (the manifest says so in `scenarios:`). A failed build retried with the same inputs while neither `main` moved takes the same number and deploys the images it already pushed |
-| plan | Surfaces | `.github/workflows/release-plan.yml` | `version` (`2.<stage>.<build>`); `known_issues` (optional, one line: the known issues Artem accepted; empty when there are none) | **Artem only** (the release owner); any other actor is refused | Prod dry run of every family for that version (Core's in two Core runs, each Surfaces family in its own job); reads the nightly gate and the build's scenario result; writes the gate and the known issues into the run's summary; its `Summary` job decides whether the plan passed. With no green nightly on the build's commit or a descendant, it runs the nightly on `main` (a descendant of the build), which can take hours. `Summary` fails on a failed dry run, or on a red part (scenarios, a nightly) with no `known_issues`. The run as a whole can be red (a nightly it ran failed) while `Summary` passed on known issues; the apply goes by `Summary` |
-| apply | Surfaces | `.github/workflows/release-apply.yml` | `version` | **Artem only** (the release owner); any other actor is refused | Follows the latest completed run titled `Release plan · <version>`, and only if its `Summary` job passed: a newer failed plan overrides an older green one. Refuses otherwise. Deploys the same images to prod in the order, checks the public hosts anonymously, then tags the release `prod/v<version>` on Core and Surfaces |
+| test-build | Surfaces | `.github/workflows/test-build.yml` | `stage` (optional: a new stage only on Artem's word; empty keeps the current one); `skipped` (optional: versions an earlier failed build spent and never tagged, space-separated, e.g. `2.2.4 2.2.5`; checked in compose, before anything deploys) | anyone on the team, or the agent through `cutting-a-test-build` | Composes `main` of Core and Surfaces at dispatch (same Proto pin, green `floor`, or it stops and says which), numbers the build `2.<stage>.<build>`, deploys to test through each repository's `deploy.yml` (Core first, then the Surfaces families; a repository whose `main` did not move since the previous build is carried, not rebuilt), runs the stand scenarios, then tags both repositories `v2.<stage>.<build>` with the build manifest. A build whose scenarios fail is still tagged (the manifest says so in `scenarios:`). A failed build retried with the same inputs while neither `main` moved takes the same number and deploys the images it already pushed. Dispatched from any ref but `main`, it does nothing and reports no error (`Compose` and everything after it is skipped) |
+| plan | Surfaces | `.github/workflows/release-plan.yml` | `version` (`2.<stage>.<build>`); `known_issues` (optional, one line: the known issues Artem accepted; empty when there are none) | **Artem only** (the release owner); any other actor is refused | Prod dry run of every family for that version (Core's in two Core runs, each Surfaces family in its own job); reads the latest green nightly on a descendant of the build in each repository and shows it as "read, not gating" (it runs no nightly and waits for none); reads the build's scenario result; writes the gate and the known issues into the run's summary; its `Summary` job decides whether the plan passed. `Summary` fails on a failed dry run, or on red scenarios with an empty `known_issues`. It checks only that `known_issues` is not empty, not that it names the red part |
+| apply | Surfaces | `.github/workflows/release-apply.yml` | `version` | **Artem only** (the release owner); any other actor is refused | Follows the latest completed run titled `Release plan · <version>`, and only if its `Summary` job passed: a newer failed plan overrides an older green one. Refuses otherwise. Deploys the version's images to prod in the order (the console is the exception: it is rebuilt from source at the tag, see below), checks the public hosts anonymously, then tags the release `prod/v<version>` on Core and Surfaces |
 
 What the workflows call, already named by earlier steps:
 
@@ -32,24 +33,60 @@ What the workflows call, already named by earlier steps:
   to `main`, so a merge commit on `main` carries no `floor` of its own: the workflow reads the latest CI
   run on `main`'s commit or on its second parent (the head of the PR that made it). A squash merge or a
   direct push to `main` has no `floor` and is refused.
-- `nightly.yml` on `main` of Core and Surfaces, mutation included. A release needs it green.
+- `nightly.yml` on `main` of Core (cron `0 20 * * *` UTC, up to 6 hours) and Surfaces (`15 20 * * *`
+  UTC), mutation included. A standing measure of the tests, not part of the release gate: the plan reads
+  it and gates on none.
 - `tooling/release/tag.sh` in Surfaces: numbers and tags Core and Surfaces as one pair (Proto gets no
   product version).
+- `tooling/delivery/lib.sh` in Core and in Surfaces: the per-family build and deploy (§ Images).
 - `surfaces/web/client/src/shared/flags/release.json` in Surfaces: the opened `FEAT` features.
 
 The deploy order: Core (core, then identity, migrations with core), then the Surfaces families
 edge-mcp, edge-analytics, web (the BFF, then the console), mobile.
 
+What the prod dry runs do not cover:
+
+- **Core's migration job** has no server-side dry run (`job.yaml has no server-side dry run` in Core's
+  dry-run log). Every migration between the version prod runs and the released one runs for the first
+  time on prod data during the apply.
+- **The console** has no dry run in the plan. At apply it is not promoted from test: the `web-console`
+  job checks out the tag, runs `pnpm install` and builds it on the runner (`hosting.sh ... --apply`),
+  checks it on a channel, then clones it to live. Prod gets a fresh build of the same source.
+
+## Images: one manifest per image
+
+Since Core #73 and Surfaces #228 every image is built with `--provenance=false --sbom=false`, so it is
+pushed as one image manifest, and `single_manifest` refuses an index right after the push and on the
+retry path (a version whose images are already pushed). A Cloud Run revision records the platform
+manifest, so a deploy of an index fails its post-replace digest check after the service was already
+replaced (test build 2.2.2's `Core → test`).
+
+The check runs at build and retry only, not at a deploy of a version pushed earlier: a version pushed
+before #73 / #228 is not checked when it is deployed. So:
+
+- `2.2.0` and `2.2.1` cannot be released (also § Builds CI cannot carry);
+- `2.2.2` is spent: its Core images were pushed (as an index) and the build was never tagged;
+- a build that carries a family `behind` at a version pushed before #73 / #228 cannot be released.
+
 ## Preconditions the plan and apply check first
 
-Both stop in their first job, and nothing reaches prod, until:
+Nothing reaches prod until all of these hold. The plan and apply check the Surfaces ones in their
+first job (`Guard`); Core's own variables stop only Core's dispatched run, so in the plan they show as a
+failed `Dry run · core + identity` (second job), in the apply as a failed `core + identity`.
 
 - the repository variable `RELEASE_OWNER` names Artem's account, in Surfaces and in Core (empty means
   nobody may run prod);
 - the repository variables `PROD_WORKLOAD_IDENTITY_PROVIDER`, `PROD_DEPLOYER_EDGE`, `PROD_DEPLOYER_WEB`
-  and `PROD_DEPLOYER_MOBILE` are set in Surfaces (prod's federation, an IAM change that is Artem's);
-- Core's `deploy.yml` on `main` has a `prod` target and a `dry_run` input (on 2026-11-17 it offers
-  `test` only; Core's release PR adds them).
+  and `PROD_DEPLOYER_MOBILE` are set in Surfaces, and `PROD_WORKLOAD_IDENTITY_PROVIDER` and
+  `PROD_DEPLOYER_CORE` in Core (prod's federation, an IAM change that is Artem's); the federation
+  provider must admit the run (it admits only runs Artem started);
+- the Surfaces secret `CROSS_REPO_TOKEN` acts as the release owner's account. The plan and apply
+  dispatch Core's `deploy.yml` with it, and Core's prod guard checks `github.actor` and
+  `triggering_actor` against Core's `RELEASE_OWNER` on that run: a token of any other account makes
+  Core unreleasable, with Core's run refused at its `Guard`;
+- the Surfaces secrets `GOLFPAD_TEST_EMAIL` and `GOLFPAD_TEST_PASSWORD` exist (the stand scenarios on
+  the runner sign in with them; without them every build records `scenarios: failure`). Set on
+  2026-11-17.
 
 A stop with one of these messages is not a defect of the build: say which precondition is missing.
 
@@ -62,13 +99,20 @@ A stop with one of these messages is not a defect of the build: say which precon
   `Surfaces → test / Scenarios` (when Surfaces moved; families `edge-mcp`, `edge-analytics`, `web-bff`,
   `mobile-bff`, `web-console`); `Scenarios` (when only Core moved); `Tag & manifest`.
 - **plan**, run `Release plan · <version>`: `Guard`, `Dry run · core + identity`, `Dry run · <family> /
-  ...` per Surfaces family, `Nightly gate`, `Nightly · start Core`, `Nightly · Surfaces`,
-  `Nightly · wait for Core`, `Summary`.
+  ...` per Surfaces family, `Nightly · read, not gating`, `Summary`.
 - **apply**, run `Release apply · <version>`: `Guard`, `core + identity`, `edge-mcp / ...`,
   `edge-analytics / ...`, `web / ...`, `mobile / ...`, `Public hosts`, `Tag`.
 - **Core's deploys** (dispatched by the three above), run `Deploy <family> → <target> · <version>`
   (`· dry run` appended for a dry run): jobs `Guard`, `core`, `identity`. Surfaces' own `deploy.yml`
   runs are named the same way.
+
+## One runner per repository
+
+Each repository has one self-hosted runner (`gpeci-surfaces`, `gpeci-core`). Jobs queue on it, and the
+waits count queue time: `Core → test` waits up to 6600 s, each Core dry run in the plan up to 3000 s,
+Core's apply up to 6600 s; on a timeout the waited Core run is cancelled. Core's nightly (from 20:00 UTC,
+up to 6 hours) or a queue of Core PR CI runs can starve a plan or apply into that cancel. The same holds
+for a test build, less sharply.
 
 ## Outputs the skills read, and how
 
@@ -79,22 +123,35 @@ can be read:
   `gh api repos/<repo>/git/ref/tags/v<version> --jq .object.sha`, then
   `gh api repos/<repo>/git/tags/<that sha> --jq .message`. It holds the commits of Core and Surfaces,
   the Proto pin, the images (`deployed:`), the families carried from an older build (`behind:`), any
-  `skipped:` versions, `scenarios:`, the run URLs and the PRs merged since the previous build with
-  their `ENG` keys (`merged:`).
+  `skipped:` versions, `scenarios:`, the run URLs and the PRs merged since the previous build
+  (`merged:`). `merged:` reads each merge commit's branch and title only, not the PR description; Core's
+  branches (`worktree/...`) and titles rarely name an `ENG` key, so `merged:` is not the list of
+  `ENG` issues. `skipped:` writes each spent version as "pushed, never deployed"; read it as "spent,
+  never tagged": a spent version may have been partly deployed (2.2.2's Core was replaced on test).
 - **The release tag**: the annotated tag `prod/v<version>` on both repositories (read the same way):
   version, time, who, the plan and apply runs, Core's runs. The known issues are not in it: they are in
   the summary of the plan run it names, which is the release record. A `prod/v` tag is never moved: a second
   apply of a version already tagged deploys again and then fails at its tag step.
 - **Outcomes**: `gh run view <id> --json conclusion,jobs` (each job's name and conclusion), and the
-  `::error::` annotations (every stop in these workflows is one; `gh run view <id>` lists them).
+  `::error::` annotations (`gh run view <id>` lists them). The workflows' own stops are annotations; a
+  failure inside a deploy script is not: it prints `[<label>] FAIL: ...` to the log, and the job ends
+  with GitHub's generic "Process completed with exit code 1". For those read `--log-failed`, of the Core
+  run as well when Core failed.
+- **What a red deploy job already changed**: a deploy replaces a resource first and checks it after,
+  so a red family job may have moved its service. In the job's log (Core: the Core run's log):
+  `job <name> completed on <image>` means the migration job ran; `<kind> <name>: <revision> is ready,
+  holds 100%, runs <image>` means the service moved and was confirmed; `deployed <family> <version>`
+  means the family finished. A `FAIL` after the replace (`holds <image>, expected ...`, `is not the
+  ready one`, `does not hold 100%`, `revision ... runs ..., expected ...`, `<job> did not complete`)
+  means the resource was replaced and the check failed: count the family as moved. `was not replaced`,
+  `jobs replace refused`, or a `FAIL` before any replace means it did not move.
 - **Per-family prod diffs and deploy output**: each Surfaces family job's log
   (`gh run view <id> --log --job <job id>`; `deploy.sh` output is tee'd there). Core's dry runs and
   deploys are separate Core runs: their URLs are in the plan's and apply's logs and in the release
   tag; read them there (`--log-failed` on the Surfaces run does not show them).
-- **Summary tables** (the plan's gate and known issues, the apply's host list, a test build's "Not
-  tagged" note): only on the run page. Whether a plan passed is readable: its `Summary` job's
-  conclusion. Ask Artem to open it, or say they were not read. Never infer
-  their content.
+- **Summary tables** (the plan's gate, its nightly lines and known issues, the apply's host list, a
+  test build's "Not tagged" note): only on the run page. Whether a plan passed is readable: its `Summary`
+  job's conclusion. Ask Artem to open it, or say they were not read. Never infer their content.
 
 ## Commands
 
@@ -115,6 +172,12 @@ gh run view <run-id> --repo maivanov/Contorra-Events-Surfaces [--json conclusion
 gh run view <run-id> --repo maivanov/Contorra-Events-Surfaces --log --job <job-id>
 gh api repos/maivanov/Contorra-Events-Surfaces/git/matching-refs/tags/v2. --jq '.[].ref'
 gh api repos/maivanov/Contorra-Events-Surfaces/git/matching-refs/tags/prod/v2. --jq '.[].ref'
+
+# what is queued on a repository's one runner, and its latest nightly
+gh run list --repo <repo> --status in_progress --json name,displayTitle,url
+gh run list --repo <repo> --status queued --json name,displayTitle,url
+gh run list --workflow nightly.yml --repo <repo> --branch main --limit 3 \
+  --json headSha,conclusion,url,createdAt
 ```
 
 **The agent never runs these.** They are handed to Artem, who runs them himself:
@@ -145,13 +208,21 @@ cancels plan or apply holds in the skills, not in the workflow.
 ## Builds CI cannot carry
 
 `v2.2.0` and `v2.2.1` were cut before these workflows. At those tags Surfaces' `deploy.sh` takes no
-version argument, so a CI deploy at those commits refuses it: neither version can be released through
-the plan and apply, and a build that carries a Surfaces family `behind` at `2.2.1` or older cannot
-either. The next build from the current `main` is clean.
+version argument, so a CI deploy at those commits refuses it, and their images predate the
+single-manifest check (§ Images): neither version can be released through the plan and apply, and a
+build that carries a Surfaces family `behind` at `2.2.1` or older cannot either. `2.2.2` is spent. The
+next build from the current `main` (Core and Surfaces both moved with #73 / #228) is clean.
 
 ## Open (not decided yet)
 
-- Mobile BFF: plan and apply deploy the `mobile` family as the last one. Whether Denis keeps a hand
-  deploy beside it is open.
+Artem's open questions. A step that depends on one asks him; it does not choose.
+
+- Mobile BFF: every test build where Surfaces moved deploys `mobile-bff` from `main`, and plan and
+  apply deploy the `mobile` family as the last one, over whatever Denis deployed by hand. Whether
+  Denis keeps a hand deploy beside it.
+- `--long` stand scenarios: neither test-build nor `deploy.yml` passes `--long`. Whether a release
+  needs them.
+- The release record: the known issues live only in the plan run's summary, which goes with the run's
+  retention; the `prod/v` tag points at the run but does not carry them. Whether they go into the tag.
 - Rollback: the previous version's images stay; a one-command rollback is not part of these workflows
-  yet.
+  yet, and a rollback to a version pushed before #73 / #228 is not checked (§ Images).
