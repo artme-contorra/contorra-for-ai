@@ -1,7 +1,7 @@
 # Cutting a test build: the procedure
 
 Loaded from `cutting-a-test-build` → `SKILL.md`. Workflow names, inputs and commands are in
-`../../../references/workflows.md` (provisional).
+`../../../references/workflows.md`.
 
 ## 1. What merged since the last build
 
@@ -24,15 +24,29 @@ wait". The last one is a reason not to build.
 - **The Proto pin.** Core and Surfaces must pin the same Proto commit at their `main`. Read each
   `proto` submodule entry: `gh api repos/<repo>/contents/proto?ref=main --jq .sha`. Different pins: the
   side that is behind needs its pin PR merged first; say which.
-- **`floor` on `main`.** The latest commit of `main` in each repository must have a green `floor`:
-  `gh api repos/<repo>/commits/main/check-runs --jq '.check_runs[] | select(.name=="floor") | .conclusion'`.
-  Red or missing: say which repository and stop.
+- **`floor` on `main`.** CI runs on pull requests, not on `main`, so `main`'s merge commit carries no
+  `floor` of its own; the workflow reads it on that commit or its second parent, the head of the PR
+  that made it. Read the same: `gh api repos/<repo>/commits/main --jq '.sha, .parents[1].sha'`, then
+  `gh api repos/<repo>/commits/<PR head sha>/check-runs --jq '.check_runs[] | select(.name=="floor") | .conclusion'`
+  (the latest run counts). Red, or missing on both the commit and its second parent (a squash merge or
+  a direct push), is the workflow's stop too: say which repository and stop.
+- **Something to build.** If neither Core's nor Surfaces' `main` moved since the last tag, the
+  workflow refuses; § 1 already shows that.
 - **The stage.** The default is the current stage. A new stage is Artem's call; ask, never assume.
 
 ## 3. Dispatch and wait
 
+- **Spent versions first.** Read the previous test-build run (`gh run list`, then
+  `gh run view <id> --json conclusion,jobs`). If it ended untagged (its `tag the pair and record the
+  manifest` job failed, or never ran, and no `v<version>` tag exists for it) after any family's build
+  or deploy job ran, its version may be spent: its images may already be pushed. That run's "Not
+  tagged" note names the `skipped` value to pass; it is on the run page only, so ask Artem to read it
+  out, or derive it: the run's version was one past the highest `v2.<stage>.*` tag, or one past the
+  highest `skipped` it was given. Pass every spent version since the last tag, accumulated and
+  space-separated (`-f skipped="2.2.4 2.2.5"`). A version not named that way makes the next build's
+  tagging refuse the gap; a version named that was never spent wastes a number.
 - Dispatch the test-build workflow from `main` of Surfaces (workflows.md § Commands). Pass `stage`
-  only when Artem named a new one.
+  only when Artem named a new one, `skipped` only as above.
 - Find the run it started (`gh run list`, the newest `workflow_dispatch` run created after the
   dispatch) and give its URL.
 - Watch it to the end (`gh run watch --exit-status`). The run deploys to the shared test stand; tell
@@ -41,17 +55,22 @@ wait". The last one is a reason not to build.
 
 ## 4. Reading the result
 
-- **Green.** Read the manifest (workflows.md § Outputs): version, commits, Proto pin, images,
-  scenario verdict, merged PRs and their `ENG` issues. Check the version tag exists on both Core and
-  Surfaces.
-- **Red.** `gh run view <id> --log-failed`. Name the step (compose, number, build, deploy, scenarios)
-  and the first failing line, in plain words. Compose failures are the reads of § 2 found late. A
-  deploy failure leaves test on the previous build or partly updated: say which families moved. A
-  scenario failure means the build is on test but not fit for QA: say so in the result and do not
-  draft a QA post for it.
-- A number the workflow pushed but never deployed is the workflow's to record; the skill only reports it.
-- Never re-run a red run blindly. Re-run only a step that failed on the machine (network, a runner
-  restart), once, and say so. A red check on the code needs a fix PR and a new build.
+- **Green.** Read the manifest from the tag `v<version>` (workflows.md § Outputs; the run's summary
+  is not readable with `gh run view`): version, commits, Proto pin, images, `behind:`, `scenarios:`,
+  merged PRs and their `ENG` issues. Check the version tag exists on both Core and Surfaces.
+- **Red.** `gh run view <id> --json conclusion,jobs`, the run's `::error::` annotations, then
+  `--log-failed`. Name the job by its role (workflows.md § Jobs): compose (the reads of § 2 found
+  late, the numbering, or "nothing moved"), Core's deploy (a separate Core run: follow its URL in the
+  job's log), a Surfaces family's build and deploy, the scenarios, or the tagging. Give the first
+  failing line in plain words. A deploy failure leaves test on the previous build or partly updated:
+  say which families moved. A failure before the tagging leaves the version untagged and maybe spent:
+  say so, and carry it into the next dispatch (§ 3).
+- **Tagged, scenarios red.** The run is red but the build is tagged and on test: the tagging job
+  stops after the tag with "deployed and tagged, but the scenarios on test are ...". The build is not
+  fit for QA and cannot be released: say so and do not draft a QA post for it.
+- Never re-run a red run blindly. On a test-build run only: re-run a job that failed on the machine
+  (network, a runner restart), once, and say so. A red check on the code needs a fix PR and a new
+  build. Plan, apply and prod runs are never re-run by the agent (workflows.md § Commands).
 
 ## 5. What the build does not do
 

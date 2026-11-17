@@ -24,12 +24,12 @@
     {
       "name": "events-tracker-dev",
       "source": "./events-tracker-dev",
-      "description": "Developer role for the Events tracker — pick up Impl Issues, walk statuses to staging, hand off to Design Review / QA, respond to bounces, review designs for implementability."
+      "description": "Developer role for the Events tracker — pick up Impl Issues; on 1.0 walk statuses to staging and hand off to Design Review / QA, on 2.0 leave the moves to Linear's GitHub integration; respond to bounces, review designs for implementability."
     },
     {
       "name": "events-tracker-qa",
       "source": "./events-tracker-qa",
-      "description": "QA role for the Events tracker — pick up Impl Issues in QA on staging, approve to Done (release gate) or reject with checklist, file sub-issue bugs."
+      "description": "QA role for the Events tracker — pick up Impl Issues in QA, test on staging (1.0) or the test stand (2.0), approve to Done (released to prod on 1.0, checked on test on 2.0) or reject with checklist, file sub-issue bugs."
     },
     {
       "name": "events-tracker-public",

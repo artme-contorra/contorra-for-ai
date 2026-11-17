@@ -8,7 +8,7 @@ This is QA's only write path on the board. Confirm once for a reject batch. **Co
 
 ## What `Done` means
 
-**On 2.0** `Done` means QA checked the issue on test, at the build that carries it. It is not a release: a release promotes a checked test build to prod and is recorded on the `FEAT` features (`Released`) and the version tags. Name the version you tested in the approve comment. On a reject, the fix's PR moves the issue forward again through Linear's GitHub integration; nobody walks it back to `QA` by hand (base § Statuses → ENG flow on 2.0).
+**On 2.0** `Done` means QA checked the issue on test, at the build that carries it. It is not a release: a release promotes a checked test build to prod and is recorded on the `FEAT` features (`Released`) and the release tags `prod/v2.<stage>.<build>` (a `v2.*` tag alone is a test build). Name the version you tested in the approve comment. On a reject, the fix's PR moves the issue forward again through Linear's GitHub integration; nobody walks it back to `QA` by hand (base § Statuses → ENG flow on 2.0).
 
 **On 1.0** QA's approve is the release gate. QA's approve sets `QA approved` and transitions `QA` → `Done`. `Done` means **released to prod**: there is no intermediate "ready to promote" status (base § Statuses → `ENG`; ontology § 4.1). The promotion itself happens outside the tracker (deploy / flip from staging); the `Done` transition records it. So the approve is a real release decision, not a stamp (delivery-flow § 2), which is why it carries per-call confirmation.
 

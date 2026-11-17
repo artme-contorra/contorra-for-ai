@@ -1,7 +1,8 @@
 # After a green apply
 
 Loaded from `releasing` → `SKILL.md` step 6. Only after the apply run is green: every family deployed,
-the host checks passed, the tag `v<version>` pushed as the release.
+the host checks passed, the release tag `prod/v<version>` pushed on Core and Surfaces (`v<version>`
+alone is the test build).
 
 ## 1. `FEAT` features to `Released`
 

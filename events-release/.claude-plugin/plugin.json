@@ -1,6 +1,6 @@
 {
   "name": "events-release",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Test builds and releases of Events 2.0: cut a test build through CI and draft the QA post; take a checked build to prod (read the gate, hand Artem the plan and apply, mark FEAT features Released, draft the team post). Judgement in the skills, mechanics in CI workflows. Depends on events-tracker-shared for Linear.",
   "author": {
     "name": "Artem Kononov",

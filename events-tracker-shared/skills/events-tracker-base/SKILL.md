@@ -105,7 +105,7 @@ This section is the self-contained operating canon for the ontology — no exter
 | `In Staging` | started | 1.0: merged; deployed to staging. Awaiting designer / QA. Not used on 2.0. |
 | `Design Review` | started | 1.0: designer reviewing impl on staging. Not used on 2.0. |
 | `QA` | started | 1.0: QA testing impl on staging. 2.0: merged (set by the integration); QA checks it on test once a test build carries it. |
-| `Done` | completed | 1.0: released to prod. 2.0: QA checked it on test. What is on prod is read from `FEAT` `Released` and the version tags, not from `Done`. |
+| `Done` | completed | 1.0: released to prod. 2.0: QA checked it on test. What is on prod is read from `FEAT` `Released` and the release tags `prod/v2.<stage>.<build>`, not from `Done`. |
 | `Canceled` | canceled | Won't ship. |
 | `Duplicate` | duplicate | Same as another issue. |
 
@@ -126,7 +126,7 @@ One flow for every `2.0` issue. Linear's GitHub integration is connected to the 
 - **A PR names its `ENG-N`** (branch name, title or description) so the integration can find the issue. A PR that names none moves nothing.
 - **No agent moves `In Review` or `QA` on a 2.0 issue**, and no agent moves a 2.0 issue to `Done` on its own judgement. If an issue did not move (the PR did not name it, or the integration is not connected for that repository yet), say so to the issue's owner; do not move it by hand in its place.
 - **`QA` is a queue, not "on the stand".** Test builds are cut deliberately, not on every merge, so a merged issue waits in `QA` until a build carries it. The build's QA post names the version and the issues now in `QA`; that is when QA picks them up.
-- **`Done` is not a release.** A 2.0 release is a test build QA has checked, promoted unchanged; it is recorded on the `FEAT` features (`Released`) and in the version tags `v2.<stage>.<build>`. Linear Releases are not used (they need the Business plan).
+- **`Done` is not a release.** A 2.0 release is a test build QA has checked, promoted unchanged; it is recorded on the `FEAT` features (`Released`) and in the release tags `prod/v2.<stage>.<build>` on Core and Surfaces. A `v2.<stage>.<build>` tag alone is a test build, not a release. Linear Releases are not used (they need the Business plan).
 - **No `In Staging`, no `Design Review` on 2.0.** The design review of 2.0 screens lives in the repository, not in `ENG` (`D-035`); the `UI` label routes nothing on a 2.0 issue.
 - Linear's settings (the integration, its rules) are the tracker owner's to change.
 

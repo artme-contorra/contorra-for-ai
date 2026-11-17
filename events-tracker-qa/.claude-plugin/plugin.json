@@ -1,6 +1,6 @@
 {
   "name": "events-tracker-qa",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "QA role for the Events tracker (Linear ENG). Pick up Impl Issues in QA status, test on staging (1.0) or the test stand (2.0), then approve (set QA approved + transition to Done: released to prod on 1.0, checked on test on 2.0) or reject (checklist comment + back to In Progress + @-mention the dev). Depends on events-tracker-shared for the base ontology.",
   "author": {
     "name": "Artem Kononov",
