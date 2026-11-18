@@ -7,11 +7,12 @@ alone is the test build).
 ## 1. `FEAT` features to `Released`
 
 - The list is the scope from `gate.md`: the features this version carries that were not `Released`.
-- Open, Artem's: whether `Released` waits for the invitations to go out, and whether a feature shipped
-  under a known issue (not `QA passed`) moves too. Until he has ruled, ask both in one line each with
-  the list, without proposing an answer, and move only what he says.
-- Show Artem the list (`FEAT-N`, title, its current status) and ask once for a yes to the whole list.
-  Then, per feature:
+- The whole scope moves right after the green apply (D-049 in the workspace): `Released` means on
+  prod, not "invitations sent". A feature shipped under a known issue (not `QA passed`) moves too; the
+  known issue in the release record says what was not checked. A `Public hosts` red only on a family
+  that is `DEPLOY=off` counts as green here (`SKILL.md` step 5); that family's features are not in
+  scope while it is off.
+- Show Artem the list (`FEAT-N`, title, its current status), then, per feature:
 
 ```
 mcp__linear-server__save_issue

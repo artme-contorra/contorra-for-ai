@@ -6,6 +6,7 @@ tools:
   - mcp__linear-server__list_issues
   - mcp__linear-server__get_issue
   - mcp__linear-server__list_comments
+  - mcp__linear-server__save_issue
 description: >
   Cut a test build of Events 2.0: decide whether there is enough to build and
   what the build is for, start the test-build CI workflow, wait for it, read
@@ -15,7 +16,8 @@ description: >
   runs the stand scenarios; the skill holds the judgement around it. Use
   whenever someone wants a new build on the test stand, asks whether a build
   is due, wants QA to get the latest fixes, or asks what went into the last
-  test build. Never touches prod, sends nothing, moves no tracker status.
+  test build. Never touches prod, sends nothing; its one tracker write is
+  `FEAT` `QA failed` → `Ready for QA` for a fix the build carries.
   Trigger phrases: "собери тестовую сборку", "выкати на тест", "нужна новая
   сборка", "пора собирать?", "cut a test build", "new build for QA",
   "what's in the test build".
@@ -23,21 +25,21 @@ description: >
 
 A test build is cut deliberately, not on every merge: the team merges many PRs a day, and the stand has to hold still for QA. One dispatch of the test-build workflow cuts one build. Everything a script can do happens in that workflow; this skill decides whether to start it, reads what it reports and writes the QA post draft. The workflow's name, inputs and outputs are in `../../references/workflows.md` (the plugin's `references/`; the one place they are named).
 
-The tracker follows the code by itself: Linear's GitHub integration has already moved every merged 2.0 issue to `ENG` `QA` (`events-tracker-base` § Statuses → ENG flow on 2.0). This skill moves no status.
+The tracker follows the code by itself: Linear's GitHub integration has already moved every merged 2.0 issue to `ENG` `QA` (`events-tracker-base` § Statuses → ENG flow on 2.0). This skill moves no `ENG` status; it moves a `FEAT` feature back to `Ready for QA` when the build carries its fix (step 5).
 
 ## Steps
 
 1. **Decide that a build is due.** Read what merged on `main` of Core and Surfaces since the last `v2.*` tag and the `ENG` issues those PRs name. Say in two or three lines what the build would be for (a fix QA is waiting on, a feature that opens, a batch of fixes) and whether that is enough. A build nobody will check is not due. Detail: `references/procedure.md` § 1.
-2. **Check what would stop it.** The workflow stops when Core and Surfaces pin different Proto commits, when a `floor` is not green (read on the head of the PR that made `main`'s tip, since `main` itself carries none), or when neither `main` moved. Read them first, so a run is not wasted; if one fails, say which and stop (`procedure.md` § 2). A new stage (`2.<n+1>.0`) only on Artem's word. Changing the opened set (`release.json`) is a PR decided before the build, never part of it.
-3. **Start the workflow and wait.** If the previous test build ended untagged, first classify its failure: on the machine (network, runner, registry, a cancel after a queue timeout) or in the code (a check that would fail again on the same commits; `procedure.md` § 4). A code failure is never retried: it needs a fix PR. A machine failure, while neither `main` moved, is retried once with the same inputs (same number, the images it pushed). Once a `main` moved and an image of that version was pushed, the version is spent: pass it (and any earlier spent ones) as `skipped`. Dispatch from `main` of Surfaces and watch the run to the end (`procedure.md` § 3). Tell the person the run's link when it starts. No notice to QA before the dispatch: QA hears about a build from Artem.
+2. **Check what would stop it.** The workflow stops when Core and Surfaces pin different Proto commits (a pin moved on one side blocks every build until the other follows), when a `floor` is not green (read on the head of the PR that made `main`'s tip, since `main` itself carries none), or when neither `main` moved. Read them first, so a run is not wasted; if one fails, say which and stop. No workflow checks test's ground: if what merged adds a secret, a grant, a family or a host, the test bootstrap runs first (`procedure.md` § 2). A new stage (`2.<n+1>.0`) only on Artem's word. Changing the opened set (`release.json`) is a PR decided before the build, never part of it.
+3. **Start the workflow and wait.** If the previous test build ended untagged, first classify its failure: on the machine (network, runner, registry, a cancel after a queue timeout, a hook left on the runner), in the ground (a secret, a grant, a resource missing on test), a revision that did not start (a retry starts nothing, a new revision is a person's step), or in the code (a check that would fail again on the same commits; `procedure.md` § 4). A code failure is never retried: it needs a fix PR. A machine failure, while neither `main` moved, is retried once with the same inputs (same number, the images it pushed). Once a `main` moved and an image of that version was pushed, the version is spent: pass it (and any earlier spent ones) as `skipped`. Dispatch from `main` of Surfaces and watch the run to the end (`procedure.md` § 3). Tell the person the run's link when it starts. No notice to QA before the dispatch: QA hears about a build from Artem.
 4. **Read the result.** Green: the version, the commits, the scenario verdict, from the tag's manifest (a run's summary is not readable with `gh run view`). Red: the job that failed and the first failing line, and what it means; whether the version was tagged (scenarios red after tagging) or left untagged (`procedure.md` § 3 decides retry or `skipped`). A red family job may already have replaced its service: read its log, say which families moved and what test runs now, and draft a stand-status line for Artem (`procedure.md` § 4, `qa-post.md`). Never relax a test or a limit to get a green build; a fix is a PR, and the next build gets the next number.
-5. **Draft the QA post** for `#team-events-ru` from the manifest: the version, what to check, the `ENG` issues now in `QA` that this build carries, known problems. Format: `references/qa-post.md`. Hand the draft to Artem; he edits and sends it.
+5. **Bring `FEAT` up to date, then draft the QA post.** A feature that is `QA failed` and whose fix this build carries goes to `Ready for QA` (`procedure.md` § 5). Then the QA post for `#team-events-ru` from the manifest: the version, what to check, the `ENG` issues now in `QA` that this build carries, known problems. Format: `references/qa-post.md`. Hand the draft to Artem; he edits and sends it.
 
 ## Rules
 
 - **Test only.** This skill never starts, reruns or cancels plan or apply, never names a prod host as a target, and makes no cloud call by any route. Prod is the `releasing` skill's, and only Artem starts it.
 - **The agent sends nothing.** The QA post and any stand-status line are drafts for Artem; QA is told about a build by Artem. No Slack, no Linear comment, no message to QA.
-- **No tracker writes.** `ENG` statuses on 2.0 are the integration's and QA's. A merged issue that is not in `QA` is reported, not moved. `FEAT` statuses are not this skill's either (`procedure.md` § 5).
+- **One tracker write.** `FEAT` `QA failed` → `Ready for QA` for a fix the build carries, after a green build (`procedure.md` § 5). `ENG` statuses on 2.0 are the integration's and QA's: a merged issue that is not in `QA` is reported, not moved.
 - **No fallback to a laptop.** If the workflow is missing, refuses, or cannot reach test, stop and report. Do not run the per-family deploy scripts by hand in its place.
 
 ## References

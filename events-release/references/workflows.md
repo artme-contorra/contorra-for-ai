@@ -1,7 +1,8 @@
 # The CI workflows behind a test build and a release
 
-As on `main` of `maivanov/Contorra-Events-Surfaces` at `00c2384f0` (the merge of #229, after #226 and
-#228) and of `maivanov/Contorra-Events-Core` at `269b4ed9` (the merge of #73, after #64).
+As on `main` of `maivanov/Contorra-Events-Surfaces` at `7e8a1e1ac` (the merge of #233, after #226, #228,
+#229 and #231) and of `maivanov/Contorra-Events-Core` at `55355e638` (the merge of #76, after #64, #73 and
+#74): the commits of build `2.2.5`, the first one released through these workflows (2026-11-17).
 This file is the one place in the plugin that names them: when a workflow changes a file name, an
 input or an output, correct it here and bump the plugin. The two skills speak of workflows by role
 (test-build, plan, apply) and never by file.
@@ -42,7 +43,14 @@ What the workflows call, already named by earlier steps:
 - `surfaces/web/client/src/shared/flags/release.json` in Surfaces: the opened `FEAT` features.
 
 The deploy order: Core (core, then identity, migrations with core), then the Surfaces families
-edge-mcp, edge-analytics, web (the BFF, then the console), mobile.
+edge-mcp, edge-analytics, web (the BFF, then the console), mobile. Every family deploys only through
+these workflows, the mobile BFF included: it rides every build from `main`, and nobody deploys it by
+hand beside them.
+
+A family's values file for an environment may say `DEPLOY=off` (Surfaces #233): its `deploy.sh` then
+says the family is off there and exits green before any cloud call. `edge-analytics` is off on test and
+prod until its hosts and sign-in exist. Turning a family on is one line in its values file, plus the
+ground it needs (§ Preconditions).
 
 What the prod dry runs do not cover:
 
@@ -52,6 +60,17 @@ What the prod dry runs do not cover:
 - **The console** has no dry run in the plan. At apply it is not promoted from test: the `web-console`
   job checks out the tag, runs `pnpm install` and builds it on the runner (`hosting.sh ... --apply`),
   checks it on a channel, then clones it to live. Prod gets a fresh build of the same source.
+
+What the apply does not know:
+
+- **`Public hosts` ignores `DEPLOY=off`.** It checks every public host, `analytics.golfpad.events`
+  too, so an apply whose families are all green ends red at `Public hosts` and writes no `prod/v` tag
+  while `edge-analytics` is off (2.2.5). Until the check skips an off family, read such a red as
+  `releasing` step 5 says: prod runs the version, the tag is missing.
+- **Scaling, memory and the database.** The forms are the same for test and prod unless a values file
+  says otherwise, and a deploy replaces the service from its form, so a setting made by hand on prod
+  (a minimum instance count) is wiped by the next deploy. 2.2.5 reached prod with every service able to
+  scale to zero. What prod needs before people use it is in `releasing` → `prod-checklist.md`.
 
 ## Images: one manifest per image
 
@@ -65,7 +84,8 @@ The check runs at build and retry only, not at a deploy of a version pushed earl
 before #73 / #228 is not checked when it is deployed. So:
 
 - `2.2.0` and `2.2.1` cannot be released (also § Builds CI cannot carry);
-- `2.2.2` is spent: its Core images were pushed (as an index) and the build was never tagged;
+- `2.2.2`, `2.2.3` and `2.2.4` are spent: each pushed images and was never tagged (the digest check,
+  two network drops on the self-hosted runner, the test ground behind the build);
 - a build that carries a family `behind` at a version pushed before #73 / #228 cannot be released.
 
 ## Preconditions the plan and apply check first
@@ -90,6 +110,14 @@ failed `Dry run · core + identity` (second job), in the apply as a failed `core
 
 A stop with one of these messages is not a defect of the build: say which precondition is missing.
 
+Not checked by any workflow: the **ground** of the target environment (Contorra-Events-Cloud's
+topology: secrets with a version, runtime grants, a resource's first deploy, host mappings). A build
+that carries a family whose ground is behind fails in that family's deploy: 2.2.4 on test found 8
+provided secrets without a version, 14 missing grants and an `edge-analytics` that did not exist, all
+from analytics and Sentry work merged since 2.2.1. The bootstrap in Contorra-Events-Cloud (`run.sh
+<env> secrets|iam|...`, a dry run first) is a person's step: on test before the build, on prod before
+the plan (`prod-checklist.md`).
+
 ## Runs and jobs, as `gh run list` and `gh run view --json jobs` name them
 
 - **test-build**, run `Test build · current stage` (or `· stage <n>`): `Compose` (the Proto pin,
@@ -106,13 +134,24 @@ A stop with one of these messages is not a defect of the build: say which precon
   (`· dry run` appended for a dry run): jobs `Guard`, `core`, `identity`. Surfaces' own `deploy.yml`
   runs are named the same way.
 
-## One runner per repository
+## Where the jobs run
 
-Each repository has one self-hosted runner (`gpeci-surfaces`, `gpeci-core`). Jobs queue on it, and the
-waits count queue time: `Core → test` waits up to 6600 s, each Core dry run in the plan up to 3000 s,
-Core's apply up to 6600 s; on a timeout the waited Core run is cancelled. Core's nightly (from 20:00 UTC,
-up to 6 hours) or a queue of Core PR CI runs can starve a plan or apply into that cancel. The same holds
-for a test build, less sharply.
+Every job that talks to Google runs on GitHub's hosted runners (`ubuntu-24.04`): every job of both
+`deploy.yml`, so the test deploys, the prod dry runs and the prod deploys; `Scenarios` of test-build;
+`Public hosts` of apply (Core #74, Surfaces #231). The team's own machine dropped TLS connections to
+Google's APIs twice in twenty minutes during build 2.2.3; this stays while it cannot hold them.
+
+The jobs that talk only to GitHub stay on the one self-hosted runner of each repository (`gpeci-surfaces`,
+`gpeci-core`): compose, the waits for Core's runs, `Tag & manifest`, `Tag`, the guards, the gate and
+`Summary`, and the CI `floor` and the nightly. Jobs queue there, and the waits count queue time:
+`Core → test` waits up to 6600 s, each Core dry run in the plan up to 3000 s, Core's apply up to
+6600 s; on a timeout the waited Core run is cancelled. Core's nightly (from 20:00 UTC, up to 6 hours) or
+a queue of Core PR CI runs can starve a plan or apply into that cancel.
+
+The self-hosted runner keeps its checkout between runs, so whatever a CI `pnpm install` leaves there
+stays: lefthook's `pre-push` hook made `Tag & manifest` of 2.2.5 abort its push with "Can't find lefthook
+in PATH". That is the machine, not the build: say so, and the hook is set aside on the runner by a
+person before the job is rerun.
 
 ## Outputs the skills read, and how
 
@@ -145,6 +184,13 @@ can be read:
   ready one`, `does not hold 100%`, `revision ... runs ..., expected ...`, `<job> did not complete`)
   means the resource was replaced and the check failed: count the family as moved. `was not replaced`,
   `jobs replace refused`, or a `FAIL` before any replace means it did not move.
+- **A failed revision is not retried by a rerun.** When a new revision fails to start (a startup
+  probe), the service keeps that failed revision as its latest. A deploy of the same version renders the
+  same template, so Cloud Run starts nothing and the job reports the same failure again within a second
+  (`Creating Revision....failed`, naming the old revision). A real second start needs a template that
+  differs (a revision suffix), which is a person's step on test and Artem's on prod (2.2.5's
+  `mobile-bff`, forced as `--revision-suffix=retry1`, then the job's rerun passed). Report it so; do not
+  dispatch a retry that cannot start anything.
 - **Per-family prod diffs and deploy output**: each Surfaces family job's log
   (`gh run view <id> --log --job <job id>`; `deploy.sh` output is tee'd there). Core's dry runs and
   deploys are separate Core runs: their URLs are in the plan's and apply's logs and in the release
@@ -210,16 +256,13 @@ cancels plan or apply holds in the skills, not in the workflow.
 `v2.2.0` and `v2.2.1` were cut before these workflows. At those tags Surfaces' `deploy.sh` takes no
 version argument, so a CI deploy at those commits refuses it, and their images predate the
 single-manifest check (§ Images): neither version can be released through the plan and apply, and a
-build that carries a Surfaces family `behind` at `2.2.1` or older cannot either. `2.2.2` is spent. The
-next build from the current `main` (Core and Surfaces both moved with #73 / #228) is clean.
+build that carries a Surfaces family `behind` at `2.2.1` or older cannot either. `2.2.2` to `2.2.4` are
+spent. `2.2.5` is the first build released through them (2026-11-17).
 
 ## Open (not decided yet)
 
 Artem's open questions. A step that depends on one asks him; it does not choose.
 
-- Mobile BFF: every test build where Surfaces moved deploys `mobile-bff` from `main`, and plan and
-  apply deploy the `mobile` family as the last one, over whatever Denis deployed by hand. Whether
-  Denis keeps a hand deploy beside it.
 - `--long` stand scenarios: neither test-build nor `deploy.yml` passes `--long`. Whether a release
   needs them.
 - The release record: the known issues live only in the plan run's summary, which goes with the run's

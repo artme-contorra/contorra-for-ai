@@ -36,6 +36,9 @@ Loaded from `releasing` → `SKILL.md` steps 2 to 4. Commands and the workflow n
   (for the first CI release, the passes given on 2.2.0 / 2.2.1 against 2.2.3). Ask him in one line
   whether QA rechecks the scope on this build or he accepts the earlier passes; do not choose, and
   do not count such a feature green until he answers.
+- A release ahead of QA (QA checks after it, as 2.2.5 for a user session that could not wait) is Artem's
+  call per release: it goes into `known_issues` as such ("QA after the release, accepted by Artem"), and
+  the features still move to `Released` at the apply (`after-apply.md`).
 
 ## Part 2: no open blocker in `ENG` `Triage`
 
@@ -104,13 +107,14 @@ command will carry. Then the question: go to plan, or not.
 Put these to Artem with the gate block, each in one line, before the plan link:
 
 - **Open questions he has not answered for this release** (`workflows.md` § Open), without a proposed
-  answer: whether Denis keeps a hand deploy of the mobile BFF beside the `mobile` family the plan and
-  apply deploy over it; whether this release needs the `--long` stand scenarios, which CI never runs;
-  what earlier QA passes mean for this build (Part 1).
+  answer: whether this release needs the `--long` stand scenarios, which CI never runs; what earlier
+  QA passes mean for this build (Part 1).
 - **The runners**: what is running or queued on Core's and Surfaces' one runner (`workflows.md`
   § Commands), and whether Core's nightly window (from 20:00 UTC, up to 6 hours) is near. A queue can
   cancel a Core dry run or deploy on its wait; propose a time outside it.
 - **The preconditions** (`workflows.md` § Preconditions) only if one is known to be missing.
+- **Prod's ground and forms** (`prod-checklist.md` § Before the plan), every time: no workflow reads
+  them, and a gap there fails the apply halfway or leaves prod cold for the first user.
 
 ## Reading the plan
 
