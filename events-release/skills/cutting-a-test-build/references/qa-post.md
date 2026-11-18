@@ -14,9 +14,9 @@ short sentences, no filler, no long dashes.
 2. **What to check.** The `ENG` issues this build carries that are now in `QA`, one line each:
    `ENG-N`, what changed in plain words, the `FEAT-N` it relates to. Group by feature when several
    issues touch one.
-3. **Features to look at again** (if any): features that were `QA failed` and whose fix this build
-   carries. Name them in the post so QA rechecks them. Who moves them back to `Ready for QA` is open
-   (`procedure.md` § 5): ask Artem in chat, beside the draft.
+3. **Features to look at again** (if any): features that were `QA failed`, whose fix this build
+   carries, and that the skill has just moved back to `Ready for QA` (`procedure.md` § 5). Name them
+   so QA rechecks them.
 4. **Newly opened features** (if `release.json` changed since the last build): `FEAT-N` and its title.
 5. **Known problems**: what is broken on this build and already filed, with its `ENG-N`, so QA does
    not file it again.

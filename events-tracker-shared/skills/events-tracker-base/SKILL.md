@@ -161,10 +161,10 @@ One flow for every `2.0` issue. Linear's GitHub integration is connected to the 
 | `Unstaged` | backlog | no stage decided | the seeding; Artem for a new feature |
 | `Planned` | unstarted | in a stage, nothing built | Artem, when he gives it a stage |
 | `In development` | started | some mark has left `none` / `no` | the seeding, then the registry sync |
-| `Ready for QA` | started | opened: the test stand runs a build that shows it | the iteration procedure; the sync when a fix reaches the stand |
+| `Ready for QA` | started | opened: the test stand runs a build that shows it | the iteration procedure; `cutting-a-test-build` (`events-release` plugin), when a build carrying the fix of a `QA failed` feature is on test |
 | `QA failed` | started | QA found an in-scope problem, written in a comment | QA |
 | `QA passed` | started | QA accepted it | QA |
-| `Released` | completed | in production | the `releasing` skill (`events-release` plugin), after the prod apply of the build that carries it |
+| `Released` | completed | in production | the `releasing` skill (`events-release` plugin), right after the prod apply of the build that carries it, the whole scope (invitations move nothing) |
 | `Not porting` | canceled | a 1.0 behaviour 2.0 does not carry; the reason in the description | Artem |
 | `Duplicate` | duplicate | Linear's own: same as another feature | anyone |
 

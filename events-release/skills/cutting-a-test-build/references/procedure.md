@@ -26,7 +26,16 @@ wait". The last one is a reason not to build.
 
 - **The Proto pin.** Core and Surfaces must pin the same Proto commit at their `main`. Read each
   `proto` submodule entry: `gh api repos/<repo>/contents/proto?ref=main --jq .sha`. Different pins: the
-  side that is behind needs its pin PR merged first; say which.
+  side that is behind needs its pin PR merged first; say which. Any merge that moves the pin in one
+  repository blocks every build until the other follows, and only compose shows it (Surfaces moved to
+  `df5f43b` with the mobile BFF's PRs, Core followed with #76 before 2.2.5): when § 1 finds a pin move
+  on one side, say the build waits on the other side's pin PR.
+- **The test ground.** No workflow checks that test's ground (Contorra-Events-Cloud's topology) holds
+  what the build's families need. If § 1 found PRs that add a secret, a grant, a family or a host
+  (analytics, Sentry and replay did, and 2.2.4 failed on them), ask the person to run the test
+  bootstrap's dry run (`run.sh test secrets|iam`) and close what it lists before the dispatch
+  (`workflows.md` § Preconditions). A family that cannot deploy green yet is `DEPLOY=off` in its test
+  values file, by a PR, not left to fail.
 - **`floor` on `main`.** CI runs on pull requests, not on `main`, so `main`'s merge commit carries no
   `floor` of its own; the workflow reads it on that commit or its second parent, the head of the PR
   that made it. Read the same: `gh api repos/<repo>/commits/main --jq '.sha, .parents[1].sha'`, then
@@ -52,8 +61,10 @@ wait". The last one is a reason not to build.
     the single-manifest check included: workflows.md § Images).
   - **A `main` moved, and the failed run pushed an image of its version:** that version is spent. Pass
     it, with every version spent before it since the last tag, as `skipped`, space-separated
-    (`-f skipped="2.2.4 2.2.5"`). A repository that did not move and had pushed an image of the spent
-    version cannot build until its `main` gets a new commit: say which.
+    (`-f skipped="2.2.2 2.2.3"`, as 2.2.4 was dispatched). A failed run whose images are pushed holds
+    both repositories at its number: while neither `main` moves, only a retry with that number works,
+    and a new number needs a new commit on each `main` that pushed an image of the spent one. Say which
+    repository needs a commit.
   - When unsure which kind it is, say so and ask Artem; do not dispatch.
   - The run's "Not tagged" note says the same and names the value; it is on the run page only, so ask
     Artem to read it out, or derive the version: one past the highest `v2.<stage>.*` tag, or one past
@@ -95,9 +106,17 @@ wait". The last one is a reason not to build.
   identity and Surfaces on the previous one). There is no rollback. Draft a stand-status line for
   Artem (`qa-post.md` § Stand status), so QA knows what the stand runs; he decides whether to send it.
 - **Machine or code.** Classify every red job before deciding the next dispatch:
-  - machine: the runner restarted or lost its network, the registry or GitHub did not answer, a wait
-    timed out in the queue and cancelled the Core run, an authentication or clone failure on the
-    runner. The same commits would pass on a healthy machine.
+  - machine: the runner restarted or lost its network (a TLS drop to `sts.googleapis.com` or
+    `iam.googleapis.com` in `google-github-actions/auth`, as 2.2.3 twice), the registry or GitHub did
+    not answer, a wait timed out in the queue and cancelled the Core run, an authentication or clone
+    failure on the runner, a git hook left on the self-hosted runner ("Can't find lefthook in PATH" in
+    `Tag & manifest`, `workflows.md` § Where the jobs run). The same commits would pass on a healthy
+    machine.
+  - ground: a secret without a version, a missing grant, a resource that does not exist on test
+    (2.2.4). Not the code and not the machine: a person runs the bootstrap (§ 2), then a retry.
+  - a revision that did not start (a startup probe failure). A retry with the same version starts
+    nothing (`workflows.md` § Outputs, "A failed revision is not retried by a rerun"): say so and ask
+    the person to force a new revision on test; once it is ready, the run's failed jobs are rerun.
   - code: a check in the workflow or the deploy scripts that fails on these commits (a digest that
     does not match, a form that does not render, a failing scenario). It fails again on a retry.
   Say which, and why, in one line.
@@ -112,9 +131,9 @@ wait". The last one is a reason not to build.
 
 - It moves no `ENG` status: the integration already moved merged 2.0 issues to `QA`, and QA moves them
   on after checking.
-- It moves no `FEAT` status. A feature whose fix this build carries goes `QA failed` → `Ready for QA`
-  at "the sync when a fix reaches the stand" (`events-tracker-base` § Statuses → `FEAT`). Who makes
-  that move in the CI path is not decided: list such features in the QA post draft and ask Artem, in
-  one line, who moves them back to `Ready for QA`. Do not move them.
+- It moves one `FEAT` status, after a green build and before the QA post (D-049 in the workspace): a
+  feature that is `QA failed` and whose fix this build carries goes to `Ready for QA`. Say which and
+  why (the PR and the `ENG` issue that fix it), move them, echo the result, and name them in the QA
+  post. Nothing else: `QA passed` and `QA failed` are QA's, `Released` is `releasing`'s.
 - It does not touch prod and does not make the build a release. A release is a later step, on a build
   QA has checked (`releasing`).
